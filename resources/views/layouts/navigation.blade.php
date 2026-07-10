@@ -15,10 +15,18 @@
                     <x-nav-link :href="route('games.index')" :active="request()->routeIs('games.*')">
                         {{ __('Game Library') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('search')" :active="request()->routeIs('search')">
+                        {{ __('Search') }}
+                    </x-nav-link>
                     @auth
                         <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                             {{ __('Dashboard') }}
                         </x-nav-link>
+                        @if(auth()->user()->role === 'admin' || auth()->user()->role === 'moderator')
+                            <x-nav-link :href="route('moderation.index')" :active="request()->routeIs('moderation.*')">
+                                {{ __('Mod Queue') }}
+                            </x-nav-link>
+                        @endif
                         @if(auth()->user()->role === 'admin')
                             <x-nav-link :href="route('admin.games.index')" :active="request()->routeIs('admin.*')">
                                 {{ __('Admin Panel') }}
@@ -112,10 +120,18 @@
             <x-responsive-nav-link :href="route('games.index')" :active="request()->routeIs('games.*')">
                 {{ __('Game Library') }}
             </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('search')" :active="request()->routeIs('search')">
+                {{ __('Search') }}
+            </x-responsive-nav-link>
             @auth
                 <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                     {{ __('Dashboard') }}
                 </x-responsive-nav-link>
+                @if(auth()->user()->role === 'admin' || auth()->user()->role === 'moderator')
+                    <x-responsive-nav-link :href="route('moderation.index')" :active="request()->routeIs('moderation.*')">
+                        {{ __('Mod Queue') }}
+                    </x-responsive-nav-link>
+                @endif
                 @if(auth()->user()->role === 'admin')
                     <x-responsive-nav-link :href="route('admin.games.index')" :active="request()->routeIs('admin.*')">
                         {{ __('Admin Panel') }}

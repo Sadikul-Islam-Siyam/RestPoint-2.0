@@ -64,7 +64,10 @@
                                             @endif
                                         </div>
 
-                                        <h3 class="font-serif text-xl font-bold text-gray-900 dark:text-darktext hover:text-darkaccent transition duration-150">
+                                        <h3 class="font-serif text-xl font-bold text-gray-900 dark:text-darktext hover:text-darkaccent transition duration-150 flex items-center flex-wrap gap-2">
+                                            @if($post->is_pinned)
+                                                <span class="px-2 py-0.5 bg-yellow-500 text-darkbg font-bold rounded text-[9px] uppercase tracking-wider">Pinned</span>
+                                            @endif
                                             <a href="{{ route('posts.show', $post->id) }}">{{ $post->title }}</a>
                                         </h3>
 

@@ -51,7 +51,8 @@
                     <!-- Body -->
                     <div>
                         <x-input-label for="body" :value="__('Body Content')" class="text-gray-900 dark:text-darktext" />
-                        <textarea id="body" name="body" rows="8" class="w-full bg-white dark:bg-darkbg text-gray-900 dark:text-darktext border-gray-300 dark:border-white/5 rounded mt-1 focus:ring-darkaccent focus:border-darkaccent text-sm shadow-sm" required placeholder="Write your post content here... you can use raw text for now.">{{ old('body') }}</textarea>
+                        <input id="body" type="hidden" name="body" value="{{ old('body') }}">
+                        <trix-editor input="body" class="trix-content bg-white dark:bg-darkbg text-gray-900 dark:text-darktext border border-gray-300 dark:border-white/5 rounded mt-1 focus:ring-darkaccent focus:border-darkaccent text-sm shadow-sm min-h-[250px]"></trix-editor>
                         <x-input-error :messages="$errors->get('body')" class="mt-2" />
                     </div>
 

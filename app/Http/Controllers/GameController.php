@@ -43,7 +43,7 @@ class GameController extends Controller
             $postsQuery->where('type', $request->type);
         }
 
-        $posts = $postsQuery->latest()->paginate(10);
+        $posts = $postsQuery->orderBy('is_pinned', 'desc')->latest()->paginate(10);
 
         // Compute stats
         $stats = [

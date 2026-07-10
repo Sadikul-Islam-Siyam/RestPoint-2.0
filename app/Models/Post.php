@@ -42,6 +42,11 @@ class Post extends Model
         return $this->morphMany(Vote::class, 'votable');
     }
 
+    public function reports()
+    {
+        return $this->morphMany(Report::class, 'reportable');
+    }
+
     public function scopeSolved($query)
     {
         return $query->where('is_solved', true);
@@ -50,5 +55,33 @@ class Post extends Model
     public function scopeForGame($query, $gameId)
     {
         return $query->where('game_id', $gameId);
+    }
+
+    public function getFormattedBodyAttribute(): string
+    {
+        $body = $this->body;
+
+        // 1. YouTube embedding (watch?v=...)
+        $body = preg_replace(
+            '/https?:\/\/(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/',
+            '<div class="my-4"><iframe class="w-full aspect-video rounded border border-gray-200 dark:border-white/5 shadow-sm" src="https://www.youtube.com/embed/$1" frameborder="0" allowfullscreen></iframe></div>',
+            $body
+        );
+
+        // 2. YouTube embedding (youtu.be/...)
+        $body = preg_replace(
+            '/https?:\/\/youtu\.be\/([a-zA-Z0-9_-]+)/',
+            '<div class="my-4"><iframe class="w-full aspect-video rounded border border-gray-200 dark:border-white/5 shadow-sm" src="https://www.youtube.com/embed/$1" frameborder="0" allowfullscreen></iframe></div>',
+            $body
+        );
+
+        // 3. Spoiler markup: ||spoiler||
+        $body = preg_replace(
+            '/\|\|(.*?)\|\|/s',
+            '<span x-data="{ revealed: false }" @click="revealed = !revealed" :class="revealed ? \'\' : \'blur-[5px] select-none cursor-pointer bg-gray-200 dark:bg-white/10 px-1 rounded\'" class="transition-all duration-200" title="Click to reveal spoiler">$1</span>',
+            $body
+        );
+
+        return $body;
     }
 }

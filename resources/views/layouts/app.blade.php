@@ -22,6 +22,32 @@
             }
         </script>
 
+        <!-- Trix Editor Assets -->
+        <link rel="stylesheet" type="text/css" href="https://unpkg.com/trix@2.0.8/dist/trix.css">
+        <script type="text/javascript" src="https://unpkg.com/trix@2.0.8/dist/trix.umd.min.js" defer></script>
+        <style>
+            /* Trix Editor Dark Mode overrides */
+            .dark trix-toolbar {
+                background-color: #1e1e24 !important;
+                border-color: rgba(255, 255, 255, 0.05) !important;
+            }
+            .dark trix-toolbar .trix-button-group {
+                border-color: rgba(255, 255, 255, 0.05) !important;
+            }
+            .dark trix-toolbar .trix-button {
+                background-color: transparent !important;
+                filter: invert(1) !important;
+            }
+            .dark trix-editor {
+                border-color: rgba(255, 255, 255, 0.05) !important;
+                background-color: #121216 !important;
+                color: #e2e8f0 !important;
+            }
+            trix-editor {
+                min-height: 250px !important;
+            }
+        </style>
+
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
@@ -48,5 +74,6 @@
         <script src="{{ asset('js/follow.js') }}" defer></script>
         <script src="{{ asset('js/notifications.js') }}" defer></script>
         <script src="{{ asset('js/vote.js') }}" defer></script>
+        <script src="{{ asset('js/report.js') }}" defer></script>
     </body>
 </html>

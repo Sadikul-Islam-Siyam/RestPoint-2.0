@@ -47,7 +47,12 @@
                     @endif
                 </div>
 
-                <h1 class="font-serif text-3xl font-bold text-gray-900 dark:text-darktext">{{ $post->title }}</h1>
+                <h1 class="font-serif text-3xl font-bold text-gray-900 dark:text-darktext">
+                    @if($post->is_pinned)
+                        <span class="inline-block align-middle me-2 px-2.5 py-0.5 bg-yellow-500 text-darkbg font-bold rounded text-xs uppercase tracking-wider">Pinned</span>
+                    @endif
+                    {{ $post->title }}
+                </h1>
 
                 <!-- Body Content -->
                 @if($post->is_spoiler)
@@ -59,12 +64,12 @@
                             </button>
                         </div>
                         <div class="text-gray-900 dark:text-darktext leading-relaxed text-sm space-y-4 p-4 bg-gray-50 dark:bg-darkbg/35 rounded border border-gray-200 dark:border-white/5">
-                            {!! nl2br(e($post->body)) !!}
+                            {!! $post->formatted_body !!}
                         </div>
                     </div>
                 @else
                     <div class="text-gray-900 dark:text-darktext leading-relaxed text-sm space-y-4">
-                        {!! nl2br(e($post->body)) !!}
+                        {!! $post->formatted_body !!}
                     </div>
                 @endif
 
@@ -83,7 +88,26 @@
                         </button>
                         <span>&bull;</span>
                         <span>{{ $post->views }} views</span>
+                        @auth
+                            <span>&bull;</span>
+                            <button class="report-btn text-red-500 dark:text-red-400 hover:underline font-semibold"
+                                    data-id="{{ $post->id }}"
+                                    data-type="post"
+                                    data-url="{{ route('reports.flag') }}">
+                                Flag Report
+                            </button>
+                        @endauth
                     </div>
+
+                    <div class="flex items-center gap-2">
+                        @if(auth()->check() && (auth()->user()->role === 'admin' || auth()->user()->role === 'moderator'))
+                            <form method="POST" action="{{ route('posts.pin', $post->id) }}">
+                                @csrf
+                                <button type="submit" class="px-2.5 py-1 bg-yellow-500 text-darkbg font-bold rounded text-[10px] hover:bg-yellow-600 transition shadow-sm uppercase">
+                                    {{ $post->is_pinned ? 'Unpin' : 'Pin' }}
+                                </button>
+                            </form>
+                        @endif
 
                     @if($post->tags->isNotEmpty())
                         <div class="flex items-center gap-1.5 flex-wrap">
@@ -159,7 +183,7 @@
                                 </div>
 
                                 <p class="text-sm text-gray-900 dark:text-darktext leading-relaxed">
-                                    {{ $comment->body }}
+                                    {!! $comment->formatted_body !!}
                                 </p>
 
                                 <!-- Actions (Reply & Upvote) -->
@@ -179,6 +203,13 @@
                                         <button @click="open = !open" class="text-[11px] text-darkaccent hover:underline flex items-center gap-1 font-semibold">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
                                             Reply
+                                        </button>
+                                        <span>&bull;</span>
+                                        <button class="report-btn text-red-500 dark:text-red-400 hover:underline font-semibold"
+                                                data-id="{{ $comment->id }}"
+                                                data-type="comment"
+                                                data-url="{{ route('reports.flag') }}">
+                                            Flag Report
                                         </button>
                                     @endauth
                                 </div>
@@ -218,7 +249,7 @@
                                                 @endif
                                             </div>
                                             <p class="text-xs text-gray-900 dark:text-darktext leading-relaxed">
-                                                {{ $reply->body }}
+                                                {!! $reply->formatted_body !!}
                                             </p>
                                         </div>
                                     @endforeach

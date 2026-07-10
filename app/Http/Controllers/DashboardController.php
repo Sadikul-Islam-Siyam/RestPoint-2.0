@@ -30,7 +30,7 @@ class DashboardController extends Controller
             });
         }
 
-        $posts = $postsQuery->latest()->paginate(10);
+        $posts = $postsQuery->orderBy('is_pinned', 'desc')->latest()->paginate(10);
 
         // Fetch some suggested games for the user to follow
         $suggestedGames = Game::withCount('followers')

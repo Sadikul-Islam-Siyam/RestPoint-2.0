@@ -172,6 +172,18 @@ class PostController extends Controller
         return redirect()->route('posts.show', $post->id)->with('success', 'Help request solved! Thank you.');
     }
 
+    public function togglePin(Post $post)
+    {
+        if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'moderator') {
+            abort(403, 'Unauthorized moderation action.');
+        }
+
+        $post->is_pinned = !$post->is_pinned;
+        $post->save();
+
+        return redirect()->back()->with('success', $post->is_pinned ? 'Post pinned successfully!' : 'Post unpinned successfully!');
+    }
+
     protected function authorizeOwner(Post $post)
     {
         if (auth()->id() !== $post->user_id && auth()->user()->role !== 'admin' && auth()->user()->role !== 'moderator') {
