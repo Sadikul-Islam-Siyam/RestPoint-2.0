@@ -10,12 +10,12 @@ class AutoCategoryService
     /**
      * Categorize a post automatically based on title, body, and tags.
      */
-    public function categorize(Post $post): int
+    public function categorize(Post $post): ?int
     {
         $categories = Category::where('game_id', $post->game_id)->get();
 
         if ($categories->isEmpty()) {
-            return $post->category_id ?? 0;
+            return $post->category_id;
         }
 
         $scores = [];

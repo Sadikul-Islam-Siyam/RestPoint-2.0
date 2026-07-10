@@ -65,7 +65,50 @@ class GameManagementController extends Controller
         // Add created_by
         $data['created_by'] = auth()->id();
 
-        Game::create($data);
+        $game = Game::create($data);
+
+        // Seed default categories for this game
+        $defaultCategories = [
+            [
+                'name' => 'Boss Strategy',
+                'slug' => 'boss-strategy',
+                'keywords' => 'boss,strategy,fight,guide,beat,build,phase,malenia,margit,radahn',
+            ],
+            [
+                'name' => 'Builds & Loadouts',
+                'slug' => 'builds-loadouts',
+                'keywords' => 'build,loadout,gear,stats,armor,weapon,skills,strength,dexterity,mage',
+            ],
+            [
+                'name' => 'Item Locations',
+                'slug' => 'item-locations',
+                'keywords' => 'location,find,item,chest,secret,map,weapon,talismans,armor,upgrade',
+            ],
+            [
+                'name' => 'Lore & Story',
+                'slug' => 'lore-story',
+                'keywords' => 'lore,story,ending,theories,character,dialogue,marika,ranni,greater',
+            ],
+            [
+                'name' => 'Technical / Bugs',
+                'slug' => 'technical-bugs',
+                'keywords' => 'bug,crash,lag,error,graphic,settings,performance,fps,freeze',
+            ],
+            [
+                'name' => 'General',
+                'slug' => 'general',
+                'keywords' => 'general,question,discussion,play,time,review,thoughts',
+            ],
+        ];
+
+        foreach ($defaultCategories as $cat) {
+            \App\Models\Category::create([
+                'game_id' => $game->id,
+                'name' => $cat['name'],
+                'slug' => $cat['slug'],
+                'keywords' => $cat['keywords']
+            ]);
+        }
 
         return redirect()->route('admin.games.index')->with('success', 'Game created successfully!');
     }
