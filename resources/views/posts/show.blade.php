@@ -132,7 +132,7 @@
                                         <span>&bull;</span>
                                         <span>{{ $comment->created_at->diffForHumans() }}</span>
                                         @if($comment->is_accepted)
-                                            <span class="px-2 py-0.5 bg-green-500 text-darkbg font-bold rounded text-[9px] uppercase tracking-wider">Solution</span>
+                                            <span class="px-2 py-0.5 bg-emerald-500 text-white font-bold rounded text-[9px] uppercase tracking-wider">Solution</span>
                                         @endif
                                     </div>
                                     
