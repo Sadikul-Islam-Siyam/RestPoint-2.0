@@ -19,10 +19,10 @@ class ThrottlePosts
             // Exclude admins and moderators from post throttling limits
             if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'moderator') {
                 $lastPost = Post::where('user_id', auth()->id())
-                    ->where('created_at', '>=', now()->subSeconds(60))
+                    ->latest()
                     ->first();
 
-                if ($lastPost) {
+                if ($lastPost && $lastPost->created_at->diffInSeconds(now()) < 60) {
                     return redirect()->back()
                         ->withInput()
                         ->withErrors(['body' => 'Anti-spam protection: Please wait 60 seconds between posting threads.']);
