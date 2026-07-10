@@ -9,10 +9,21 @@
                     {{ $game->genre }} &bull; Developed by {{ $game->developer }}
                 </p>
             </div>
+            @auth
+                @php
+                    $isFollowing = auth()->user()->followedGames()->where('game_id', $game->id)->exists();
+                @endphp
+            @else
+                @php
+                    $isFollowing = false;
+                @endphp
+            @endauth
             <div class="flex items-center gap-4">
-                <!-- Follow button (placeholder) -->
-                <button class="px-4 py-2 border border-darkaccent text-darkaccent font-semibold rounded hover:bg-darkaccent/10 transition duration-150 text-sm">
-                    Follow Game
+                <!-- Follow button -->
+                <button class="follow-game-btn px-4 py-2 border border-darkaccent text-darkaccent font-semibold rounded hover:bg-darkaccent/10 transition duration-150 text-sm {{ $isFollowing ? 'bg-darkaccent/10' : '' }}"
+                        data-game-id="{{ $game->id }}"
+                        data-url="{{ route('follow.game') }}">
+                    {{ $isFollowing ? 'Unfollow Game' : 'Follow Game' }}
                 </button>
                 @auth
                     <a href="{{ route('posts.create', ['game' => $game->id]) }}" class="px-4 py-2 bg-darkaccent text-white dark:text-darkbg font-semibold rounded hover:opacity-90 transition duration-150 text-sm shadow-sm">
@@ -60,7 +71,7 @@
                                 <span class="text-xs text-gray-500 dark:text-darkmuted">Posts</span>
                             </div>
                             <div>
-                                <span class="text-2xl font-bold text-darkaccent block">{{ $stats['followers_count'] }}</span>
+                                <span id="follower_count" class="text-2xl font-bold text-darkaccent block">{{ $stats['followers_count'] }}</span>
                                 <span class="text-xs text-gray-500 dark:text-darkmuted">Followers</span>
                             </div>
                         </div>
@@ -101,13 +112,18 @@
                     @else
                         <div class="space-y-4">
                             @foreach($posts as $post)
+                                @php
+                                    $hasVoted = auth()->check() ? $post->votes()->where('user_id', auth()->id())->exists() : false;
+                                @endphp
                                 <div class="bg-white dark:bg-darksurface p-6 rounded-lg border border-gray-200 dark:border-white/5 hover:border-gray-300 dark:hover:border-white/10 transition duration-150 flex gap-4 shadow-sm">
-                                    <!-- Upvote counter -->
-                                    <div class="flex flex-col items-center justify-start text-gray-500 dark:text-darkmuted pr-2">
-                                        <button class="hover:text-darkaccent transition">
+                                    <div class="flex flex-col items-center justify-start pr-2">
+                                        <button class="vote-btn hover:text-darkaccent transition {{ $hasVoted ? 'text-darkaccent' : 'text-gray-500 dark:text-darkmuted' }}"
+                                                data-id="{{ $post->id }}"
+                                                data-type="post"
+                                                data-url="{{ route('vote.toggle') }}">
                                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+                                            <span class="vote-count text-xs font-bold block mt-1">{{ $post->votes_count }}</span>
                                         </button>
-                                        <span class="text-xs font-bold my-1 text-gray-900 dark:text-darktext">{{ $post->votes_count }}</span>
                                     </div>
 
                                     <div class="flex-grow space-y-2">

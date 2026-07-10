@@ -43,5 +43,10 @@
                 {{ $slot }}
             </main>
         </div>
+
+        <!-- Custom JS assets -->
+        <script src="{{ asset('js/follow.js') }}" defer></script>
+        <script src="{{ asset('js/notifications.js') }}" defer></script>
+        <script src="{{ asset('js/vote.js') }}" defer></script>
     </body>
 </html>

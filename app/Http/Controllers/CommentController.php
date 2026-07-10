@@ -35,6 +35,43 @@ class CommentController extends Controller
 
         $comment->save();
 
+        // Notify post owner (if they are not the comment author)
+        if ($post->user_id !== $comment->user_id) {
+            \App\Models\Notification::create([
+                'user_id' => $post->user_id,
+                'type' => 'reply',
+                'data' => [
+                    'comment_id' => $comment->id,
+                    'post_id' => $post->id,
+                    'author_username' => auth()->user()->username,
+                    'message' => auth()->user()->username . " replied to your post: \"{$post->title}\".",
+                ],
+            ]);
+        }
+
+        // Notify parent comment owner (if replying to someone else)
+        if ($comment->parent_id) {
+            $parent = Comment::find($comment->parent_id);
+            if ($parent && $parent->user_id !== $comment->user_id && $parent->user_id !== $post->user_id) {
+                \App\Models\Notification::create([
+                    'user_id' => $parent->user_id,
+                    'type' => 'reply',
+                    'data' => [
+                        'comment_id' => $comment->id,
+                        'post_id' => $post->id,
+                        'author_username' => auth()->user()->username,
+                        'message' => auth()->user()->username . " replied to your comment.",
+                    ],
+                ]);
+            }
+        }
+
+        // Parse mentions inside body
+        (new \App\Services\MentionService())->parseMentions($comment);
+
+        // Award XP and check badges
+        (new \App\Services\BadgeService())->awardXP(auth()->user(), 5);
+
         return redirect()->route('posts.show', $post->id)->with('success', 'Comment posted!');
     }
 

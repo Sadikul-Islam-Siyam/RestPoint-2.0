@@ -37,6 +37,24 @@
                 </button>
 
                 @auth
+                    <!-- Notification Bell Dropdown -->
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" id="notification_bell" class="relative p-2 rounded-full text-gray-500 dark:text-darkmuted hover:text-gray-900 dark:hover:text-darktext hover:bg-gray-100 dark:hover:bg-white/5 focus:outline-none transition-colors duration-150">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                            <span id="notification_count" class="absolute top-1 right-1 px-1.5 py-0.5 text-[8px] font-bold leading-none text-white bg-red-600 rounded-full hidden">0</span>
+                        </button>
+                        
+                        <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-80 bg-white dark:bg-darksurface rounded-md border border-gray-200 dark:border-white/5 shadow-lg overflow-hidden z-30 py-1" style="display: none;">
+                            <div class="px-4 py-2 border-b border-gray-100 dark:border-white/5 flex justify-between items-center">
+                                <span class="font-serif text-sm font-bold text-gray-900 dark:text-darktext">Alerts</span>
+                                <a href="{{ route('notifications.index') }}" class="text-[10px] text-darkaccent hover:underline font-semibold">View All</a>
+                            </div>
+                            <div id="notification_list" class="divide-y divide-gray-100 dark:divide-white/5 max-h-60 overflow-y-auto">
+                                <div class="px-4 py-3 text-xs text-gray-500 dark:text-darkmuted text-center">No alerts.</div>
+                            </div>
+                        </div>
+                    </div>
+
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
                             <button class="inline-flex items-center px-3 py-2 border border-gray-200 dark:border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-darkmuted bg-white dark:bg-darksurface hover:text-gray-700 dark:hover:text-darktext focus:outline-none transition ease-in-out duration-150">
@@ -117,6 +135,12 @@
                 <div class="mt-3 space-y-1">
                     <x-responsive-nav-link :href="route('profile.edit')">
                         {{ __('Profile Settings') }}
+                    </x-responsive-nav-link>
+
+                    <!-- Notifications -->
+                    <x-responsive-nav-link :href="route('notifications.index')" class="flex justify-between items-center">
+                        <span>{{ __('Notifications') }}</span>
+                        <span id="notification_count_mobile" class="px-1.5 py-0.5 text-[8px] font-bold leading-none text-white bg-red-600 rounded-full hidden">0</span>
                     </x-responsive-nav-link>
 
                     <!-- Authentication -->

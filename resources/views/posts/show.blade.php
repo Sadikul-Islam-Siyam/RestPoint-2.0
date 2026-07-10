@@ -70,7 +70,18 @@
 
                 <!-- Meta bar -->
                 <div class="pt-4 border-t border-gray-200 dark:border-white/5 flex justify-between items-center flex-wrap gap-4 text-xs text-gray-500 dark:text-darkmuted">
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-4">
+                        @php
+                            $hasPostVoted = auth()->check() ? $post->votes()->where('user_id', auth()->id())->exists() : false;
+                        @endphp
+                        <button class="vote-btn hover:text-darkaccent transition flex items-center gap-1 font-semibold {{ $hasPostVoted ? 'text-darkaccent' : 'text-gray-500 dark:text-darkmuted' }}"
+                                data-id="{{ $post->id }}"
+                                data-type="post"
+                                data-url="{{ route('vote.toggle') }}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+                            Upvote (<span class="vote-count font-bold">{{ $post->votes()->count() }}</span>)
+                        </button>
+                        <span>&bull;</span>
                         <span>{{ $post->views }} views</span>
                     </div>
 
@@ -114,7 +125,7 @@
                     @foreach($comments as $comment)
                         <div class="space-y-4">
                             <!-- Top-level Comment -->
-                            <div class="bg-white dark:bg-darksurface p-6 rounded-lg border {{ $comment->is_accepted ? 'border-green-500 bg-green-50 dark:bg-green-950/10' : 'border-gray-200 dark:border-white/5' }} space-y-3 shadow-sm transition-colors duration-150">
+                            <div x-data="{ open: false }" class="bg-white dark:bg-darksurface p-6 rounded-lg border {{ $comment->is_accepted ? 'border-green-500 bg-green-50 dark:bg-green-950/10' : 'border-gray-200 dark:border-white/5' }} space-y-3 shadow-sm transition-colors duration-150">
                                 <div class="flex justify-between items-start flex-wrap gap-2 text-xs text-gray-500 dark:text-darkmuted">
                                     <div class="flex items-center gap-2">
                                         <strong class="text-gray-900 dark:text-darktext">{{ $comment->user->username }}</strong>
@@ -151,25 +162,39 @@
                                     {{ $comment->body }}
                                 </p>
 
-                                <!-- Reply Action -->
-                                @auth
-                                    <div x-data="{ open: false }" class="space-y-3">
+                                <!-- Actions (Reply & Upvote) -->
+                                <div class="flex items-center gap-4 text-xs mt-3 pt-2 border-t border-gray-100 dark:border-white/5">
+                                    @php
+                                        $hasCommentVoted = auth()->check() ? $comment->votes()->where('user_id', auth()->id())->exists() : false;
+                                    @endphp
+                                    <button class="vote-btn hover:text-darkaccent transition flex items-center gap-1 font-semibold {{ $hasCommentVoted ? 'text-darkaccent' : 'text-gray-500 dark:text-darkmuted' }}"
+                                            data-id="{{ $comment->id }}"
+                                            data-type="comment"
+                                            data-url="{{ route('vote.toggle') }}">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+                                        Upvote (<span class="vote-count font-bold">{{ $comment->votes()->count() }}</span>)
+                                    </button>
+
+                                    @auth
                                         <button @click="open = !open" class="text-[11px] text-darkaccent hover:underline flex items-center gap-1 font-semibold">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
                                             Reply
                                         </button>
+                                    @endauth
+                                </div>
 
-                                        <form x-show="open" x-collapse method="POST" action="{{ route('comments.store') }}" class="mt-2 pl-4 border-l border-gray-200 dark:border-white/5 space-y-2">
-                                            @csrf
-                                            <input type="hidden" name="post_id" value="{{ $post->id }}">
-                                            <input type="hidden" name="parent_id" value="{{ $comment->id }}">
-                                            
-                                            <textarea name="body" rows="2" class="w-full bg-white dark:bg-darkbg text-gray-900 dark:text-darktext border-gray-300 dark:border-white/5 rounded focus:ring-darkaccent focus:border-darkaccent text-xs shadow-sm" required placeholder="Write a reply..."></textarea>
-                                            <button type="submit" class="px-4 py-1.5 bg-darkaccent text-white dark:text-darkbg font-semibold rounded hover:opacity-90 text-[10px] shadow-sm">
-                                                Submit Reply
-                                            </button>
-                                        </form>
-                                    </div>
+                                <!-- Nested Reply Form (inline, shown when open is toggled) -->
+                                @auth
+                                    <form x-show="open" x-collapse method="POST" action="{{ route('comments.store') }}" class="mt-2 pl-4 border-l border-gray-200 dark:border-white/5 space-y-2" style="display: none;">
+                                        @csrf
+                                        <input type="hidden" name="post_id" value="{{ $post->id }}">
+                                        <input type="hidden" name="parent_id" value="{{ $comment->id }}">
+                                        
+                                        <textarea name="body" rows="2" class="w-full bg-white dark:bg-darkbg text-gray-900 dark:text-darktext border-gray-300 dark:border-white/5 rounded focus:ring-darkaccent focus:border-darkaccent text-xs shadow-sm" required placeholder="Write a reply..."></textarea>
+                                        <button type="submit" class="px-4 py-1.5 bg-darkaccent text-white dark:text-darkbg font-semibold rounded hover:opacity-90 text-[10px] shadow-sm">
+                                            Submit Reply
+                                        </button>
+                                    </form>
                                 @endauth
                             </div>
 

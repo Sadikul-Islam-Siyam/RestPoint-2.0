@@ -77,6 +77,9 @@ class PostController extends Controller
             $post->tags()->sync($tagIds);
         }
 
+        // Award XP and check badges
+        (new \App\Services\BadgeService())->awardXP(auth()->user(), 10);
+
         return redirect()->route('posts.show', $post->id)->with('success', 'Post created successfully!');
     }
 
@@ -149,6 +152,22 @@ class PostController extends Controller
 
         $post->is_solved = true;
         $post->save();
+
+        // Notify solution author (if it is not the post author themselves)
+        if ($comment->user_id !== $post->user_id) {
+            \App\Models\Notification::create([
+                'user_id' => $comment->user_id,
+                'type' => 'solved',
+                'data' => [
+                    'comment_id' => $comment->id,
+                    'post_id' => $post->id,
+                    'message' => "Your answer was accepted as the solution for: \"{$post->title}\".",
+                ],
+            ]);
+        }
+
+        // Award XP and check badges for solution author
+        (new \App\Services\BadgeService())->awardXP($comment->user, 50);
 
         return redirect()->route('posts.show', $post->id)->with('success', 'Help request solved! Thank you.');
     }
