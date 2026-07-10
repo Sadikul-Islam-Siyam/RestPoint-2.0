@@ -12,6 +12,13 @@ class Comment extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected function casts(): array
+    {
+        return [
+            'is_accepted' => 'boolean',
+        ];
+    }
+
     public function post()
     {
         return $this->belongsTo(Post::class);

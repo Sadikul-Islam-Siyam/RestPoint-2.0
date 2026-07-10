@@ -24,7 +24,7 @@ class CommentController extends Controller
         $comment->body = $validated['body'];
 
         // Enforce 2-level nesting: if parent has a parent, flatten to parent's parent
-        if ($validated['parent_id']) {
+        if (isset($validated['parent_id']) && $validated['parent_id']) {
             $parentComment = Comment::findOrFail($validated['parent_id']);
             if ($parentComment->parent_id) {
                 $comment->parent_id = $parentComment->parent_id;

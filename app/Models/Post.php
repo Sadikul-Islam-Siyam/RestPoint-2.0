@@ -12,6 +12,15 @@ class Post extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected function casts(): array
+    {
+        return [
+            'is_pinned' => 'boolean',
+            'is_solved' => 'boolean',
+            'is_spoiler' => 'boolean',
+        ];
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
