@@ -17,7 +17,6 @@ Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'ind
 // Public Browsing (No auth required - Reddit & Fandom Style!)
 Route::get('/games', [GameController::class, 'index'])->name('games.index');
 Route::get('/games/{game:slug}', [GameController::class, 'show'])->name('games.show');
-Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
 Route::get('/users/{username}', [\App\Http\Controllers\UserProfileController::class, 'show'])->name('profile.show');
 Route::get('/search', [\App\Http\Controllers\SearchController::class, 'index'])->name('search');
 
@@ -51,6 +50,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/moderation/reports/{report}/dismiss', [\App\Http\Controllers\ModerationController::class, 'dismiss'])->name('moderation.dismiss');
     Route::post('/moderation/reports/{report}/resolve', [\App\Http\Controllers\ModerationController::class, 'resolve'])->name('moderation.resolve');
 });
+
+Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
 
 // Admin-Only Game Curator Panel (Requires admin role)
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
