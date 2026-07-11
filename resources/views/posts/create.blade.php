@@ -44,7 +44,7 @@
                     <!-- Title -->
                     <div>
                         <x-input-label for="title" :value="__('Post Title')" class="text-gray-900 dark:text-darktext" />
-                        <x-text-input id="title" name="title" type="text" class="w-full bg-white dark:bg-darkbg text-gray-900 dark:text-darktext border-gray-300 dark:border-white/5 rounded mt-1 focus:ring-darkaccent focus:border-darkaccent shadow-sm" :value="old('title')" required placeholder="e.g. Tips for defeating Margit?" />
+                        <x-text-input id="title" name="title" type="text" class="w-full bg-white dark:bg-darkbg text-gray-900 dark:text-darktext border-gray-300 dark:border-white/5 rounded mt-1 focus:ring-darkaccent focus:border-darkaccent shadow-sm" :value="old('title')" required placeholder="" />
                         <x-input-error :messages="$errors->get('title')" class="mt-2" />
                     </div>
 
@@ -56,11 +56,13 @@
                         <x-input-error :messages="$errors->get('body')" class="mt-2" />
                     </div>
 
-                    <!-- Tags -->
+                    <!-- Tags selection -->
                     <div>
-                        <x-input-label for="tags" :value="__('Tags (Comma-separated)')" class="text-gray-900 dark:text-darktext" />
-                        <x-text-input id="tags" name="tags" type="text" class="w-full bg-white dark:bg-darkbg text-gray-900 dark:text-darktext border-gray-300 dark:border-white/5 rounded mt-1 focus:ring-darkaccent focus:border-darkaccent shadow-sm" :value="old('tags')" placeholder="e.g. boss-guide, strategy, melee" />
-                        <span class="text-xs text-gray-500 dark:text-darkmuted mt-1 block">Help others search and find your post.</span>
+                        <x-input-label :value="__('Select Tags')" class="text-gray-900 dark:text-darktext" />
+                        <div id="tags_container" class="flex flex-wrap gap-2 mt-2 min-h-[40px] items-center p-3 bg-gray-50 dark:bg-black/20 rounded border border-gray-200 dark:border-white/5 transition-colors duration-150">
+                            <!-- Clickable tags dynamically inserted here -->
+                        </div>
+                        <span class="text-xs text-gray-500 dark:text-darkmuted mt-1.5 block">Categorize your post with these tags to help others search and find it.</span>
                         <x-input-error :messages="$errors->get('tags')" class="mt-2" />
                     </div>
 
@@ -82,6 +84,60 @@
                         </a>
                     </div>
                 </form>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const gameSelect = document.getElementById('game_id');
+                        const tagsContainer = document.getElementById('tags_container');
+                        
+                        const gamesTags = @json($games->mapWithKeys(fn($g) => [$g->id => $g->tags]));
+                        const oldTags = @json(old('tags', []));
+
+                        function renderTags(gameId) {
+                            tagsContainer.innerHTML = '';
+                            const tags = gamesTags[gameId] || [];
+
+                            if (tags.length === 0) {
+                                tagsContainer.innerHTML = '<span class="text-xs text-gray-400 dark:text-darkmuted">No tags available for this game.</span>';
+                                return;
+                            }
+
+                            tags.forEach(tag => {
+                                const isChecked = oldTags.includes(tag.id.toString()) || oldTags.includes(tag.id);
+                                
+                                const label = document.createElement('label');
+                                label.className = `inline-flex items-center px-3 py-1.5 rounded-full border text-xs font-semibold cursor-pointer select-none transition-all duration-150 ` +
+                                    (isChecked 
+                                        ? 'bg-darkaccent border-darkaccent text-white dark:text-darkbg shadow-sm font-bold' 
+                                        : 'bg-white dark:bg-darkbg border-gray-200 dark:border-white/5 text-gray-600 dark:text-darktext hover:bg-gray-50 dark:hover:bg-white/[0.02]');
+                                
+                                label.innerHTML = `
+                                    <input type="checkbox" name="tags[]" value="${tag.id}" ${isChecked ? 'checked' : ''} class="hidden tag-checkbox">
+                                    <span>${tag.name}</span>
+                                `;
+
+                                const input = label.querySelector('input');
+                                input.addEventListener('change', function () {
+                                    if (this.checked) {
+                                        label.className = 'inline-flex items-center px-3 py-1.5 rounded-full border text-xs font-bold cursor-pointer select-none transition-all duration-150 bg-darkaccent border-darkaccent text-white dark:text-darkbg shadow-sm';
+                                    } else {
+                                        label.className = 'inline-flex items-center px-3 py-1.5 rounded-full border text-xs font-semibold cursor-pointer select-none transition-all duration-150 bg-white dark:bg-darkbg border-gray-200 dark:border-white/5 text-gray-600 dark:text-darktext hover:bg-gray-50 dark:hover:bg-white/[0.02]';
+                                    }
+                                });
+
+                                tagsContainer.appendChild(label);
+                            });
+                        }
+
+                        if (gameSelect.value) {
+                            renderTags(gameSelect.value);
+                        }
+
+                        gameSelect.addEventListener('change', function () {
+                            renderTags(this.value);
+                        });
+                    });
+                </script>
 
             </div>
         </div>

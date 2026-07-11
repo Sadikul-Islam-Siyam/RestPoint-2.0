@@ -1,50 +1,136 @@
 <nav x-data="{ open: false }" class="bg-white dark:bg-darksurface border-b border-gray-200 dark:border-white/5 shadow-sm transition-colors duration-150">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex">
-                <!-- Logo -->
-                <div class="shrink-0 flex items-center">
-                    <a href="{{ route('home') }}" class="font-serif text-xl font-bold text-darkaccent tracking-wide hover:opacity-80 transition duration-150">
-                        RestPoint
+        <div class="flex items-center justify-between h-16 gap-4">
+            
+            <!-- Left Side: Logo & Links -->
+            <div class="flex items-center gap-6 shrink-0">
+                <div class="flex items-center">
+                    <a href="{{ route('home') }}" class="font-serif text-xl font-bold text-darkaccent tracking-wide hover:opacity-80 transition duration-150 flex items-center gap-1.5">
+                        <span>RestPoint</span>
                     </a>
                 </div>
 
-                <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('games.index')" :active="request()->routeIs('games.*')">
-                        {{ __('Game Library') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('search')" :active="request()->routeIs('search')">
-                        {{ __('Search') }}
-                    </x-nav-link>
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="{{ route('games.index') }}" class="text-sm font-semibold text-gray-500 dark:text-darkmuted hover:text-gray-900 dark:hover:text-darktext transition {{ request()->routeIs('games.*') ? 'text-darkaccent dark:text-darkaccent' : '' }}">
+                        Library
+                    </a>
                     @auth
-                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                            {{ __('Dashboard') }}
-                        </x-nav-link>
+                        <a href="{{ route('dashboard') }}" class="text-sm font-semibold text-gray-500 dark:text-darkmuted hover:text-gray-900 dark:hover:text-darktext transition {{ request()->routeIs('dashboard') ? 'text-darkaccent dark:text-darkaccent' : '' }}">
+                            Dashboard
+                        </a>
                         @if(auth()->user()->role === 'admin' || auth()->user()->role === 'moderator')
-                            <x-nav-link :href="route('moderation.index')" :active="request()->routeIs('moderation.*')">
-                                {{ __('Mod Queue') }}
-                            </x-nav-link>
+                            <a href="{{ route('moderation.index') }}" class="text-sm font-semibold text-gray-500 dark:text-darkmuted hover:text-gray-900 dark:hover:text-darktext transition {{ request()->routeIs('moderation.*') ? 'text-darkaccent dark:text-darkaccent' : '' }}">
+                                Mod Queue
+                            </a>
                         @endif
                         @if(auth()->user()->role === 'admin')
-                            <x-nav-link :href="route('admin.games.index')" :active="request()->routeIs('admin.*')">
-                                {{ __('Admin Panel') }}
-                            </x-nav-link>
+                            <a href="{{ route('admin.games.index') }}" class="text-sm font-semibold text-gray-500 dark:text-darkmuted hover:text-gray-900 dark:hover:text-darktext transition {{ request()->routeIs('admin.*') ? 'text-darkaccent dark:text-darkaccent' : '' }}">
+                                Admin
+                            </a>
                         @endif
                     @endauth
                 </div>
             </div>
 
-            <!-- Settings Dropdown / Guest Auth Links -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6 gap-3">
-                <!-- Theme Toggle Button -->
+            <!-- Center Side: Reddit Search bar with Sparkle Ask button & Suggestions dropdown -->
+            <div class="flex-grow max-w-lg relative" x-data="{ open: false, query: '{{ request()->input('q', '') }}', games: [], suggestions: [], loading: false }" @click.away="open = false">
+                <form action="{{ route('dashboard') }}" method="GET" class="w-full">
+                    <div class="relative flex items-center">
+                        <span class="absolute left-3.5 text-gray-400 dark:text-darkmuted text-xs">🔍</span>
+                        <input type="text" 
+                               name="q" 
+                               x-model="query"
+                               @focus="open = true"
+                               @input.debounce.250ms="
+                                   if (query.length >= 2) {
+                                       loading = true;
+                                       fetch('/api/search/suggestions?q=' + encodeURIComponent(query))
+                                           .then(res => res.json())
+                                           .then(data => {
+                                               games = data.games;
+                                               suggestions = data.suggestions;
+                                               loading = false;
+                                           });
+                                   } else {
+                                       games = [];
+                                       suggestions = [];
+                                   }
+                               "
+                               placeholder="Find anything" 
+                               class="w-full pl-9 pr-20 py-1.5 bg-gray-100 dark:bg-darkbg text-gray-900 dark:text-darktext border border-transparent focus:border-darkaccent dark:focus:border-darkaccent focus:ring-1 focus:ring-darkaccent dark:focus:ring-darkaccent rounded-full text-sm shadow-sm placeholder-gray-400 dark:placeholder-darkmuted transition"
+                               required
+                               autocomplete="off">
+                        
+                        <!-- Sparkle Ask Button -->
+                        <button type="submit" 
+                                name="ask" 
+                                value="1"
+                                class="absolute right-1.5 px-3 py-1 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold rounded-full text-xs shadow-sm flex items-center gap-1 transition">
+                            <span>✨</span>
+                            <span>Ask</span>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- suggestions dropdown -->
+                <div x-show="open && (games.length > 0 || suggestions.length > 0 || loading)" 
+                     class="absolute left-0 right-0 mt-2 bg-white dark:bg-darksurface rounded-xl border border-gray-200 dark:border-white/5 shadow-xl overflow-hidden z-50 py-2 divide-y divide-gray-100 dark:divide-white/5"
+                     style="display: none;">
+                    
+                    <template x-if="loading">
+                        <div class="px-4 py-2 text-xs text-gray-500 dark:text-darkmuted">Searching...</div>
+                    </template>
+
+                    <!-- queries suggestions -->
+                    <template x-if="suggestions.length > 0">
+                        <div class="py-1">
+                            <template x-for="item in suggestions">
+                                <a :href="'/dashboard?q=' + encodeURIComponent(item)" 
+                                   class="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 dark:hover:bg-white/5 text-xs font-semibold text-gray-700 dark:text-darktext transition">
+                                    <span class="text-gray-400">🔍</span>
+                                    <span x-text="item"></span>
+                                </a>
+                            </template>
+                        </div>
+                    </template>
+
+                    <!-- games communities -->
+                    <template x-if="games.length > 0">
+                        <div class="py-1.5">
+                            <div class="px-4 py-1 text-[9px] text-gray-400 dark:text-darkmuted uppercase font-bold tracking-wider">Communities</div>
+                            <template x-for="game in games">
+                                <a :href="'/games/' + game.slug" 
+                                   class="flex items-center justify-between px-4 py-2 hover:bg-gray-50 dark:hover:bg-white/5 transition">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-sm shrink-0">🎮</span>
+                                        <div>
+                                            <span x-text="game.name" class="text-xs font-bold text-gray-900 dark:text-darktext block"></span>
+                                            <span x-text="game.followers_count + ' followed'" class="text-[9px] text-gray-400 dark:text-darkmuted block"></span>
+                                        </div>
+                                    </div>
+                                    <span class="text-[9px] bg-darkaccent/10 border border-darkaccent/20 text-darkaccent font-bold px-2 py-0.5 rounded-full">View</span>
+                                </a>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Right Side: Dropdowns, Bells & Toggle Theme -->
+            <div class="flex items-center gap-3 shrink-0">
                 <button id="theme_toggle" class="p-2 rounded-full text-gray-500 dark:text-darkmuted hover:text-gray-900 dark:hover:text-darktext hover:bg-gray-100 dark:hover:bg-white/5 focus:outline-none transition-colors duration-150">
                     <svg id="sun_icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path></svg>
                     <svg id="moon_icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
                 </button>
 
                 @auth
+                    <!-- Global Create Post Button -->
+                    <a href="{{ route('posts.create') }}" class="flex items-center gap-1 px-3 py-1.5 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/10 text-gray-700 dark:text-darktext text-xs font-bold rounded-full transition shadow-sm shrink-0">
+                        <span class="text-sm font-semibold">+</span>
+                        <span>Create</span>
+                    </a>
+
                     <!-- Notification Bell Dropdown -->
                     <div class="relative" x-data="{ open: false }">
                         <button @click="open = !open" id="notification_bell" class="relative p-2 rounded-full text-gray-500 dark:text-darkmuted hover:text-gray-900 dark:hover:text-darktext hover:bg-gray-100 dark:hover:bg-white/5 focus:outline-none transition-colors duration-150">
@@ -76,8 +162,8 @@
                         </x-slot>
 
                         <x-slot name="content">
-                            <x-dropdown-link :href="route('profile.edit')">
-                                {{ __('Profile Settings') }}
+                            <x-dropdown-link :href="route('profile.show', Auth::user()->username)">
+                                {{ __('My Profile') }}
                             </x-dropdown-link>
 
                             <!-- Authentication -->
@@ -92,8 +178,8 @@
                         </x-slot>
                     </x-dropdown>
                 @else
-                    <a href="{{ route('login') }}" class="text-sm text-gray-500 dark:text-darkmuted hover:text-gray-900 dark:hover:text-darktext transition duration-150">Log in</a>
-                    <a href="{{ route('register') }}" class="ms-4 text-sm text-gray-500 dark:text-darkmuted hover:text-gray-900 dark:hover:text-darktext transition duration-150">Register</a>
+                    <a href="{{ route('login') }}" class="text-sm text-gray-500 dark:text-darkmuted hover:text-gray-900 dark:hover:text-darktext transition duration-150 font-bold">Log in</a>
+                    <a href="{{ route('register') }}" class="ms-4 text-sm text-gray-500 dark:text-darkmuted hover:text-gray-900 dark:hover:text-darktext transition duration-150 font-bold bg-darkaccent text-white dark:text-darkbg px-3.5 py-1.5 rounded-full">Register</a>
                 @endauth
             </div>
 
@@ -149,8 +235,8 @@
                 </div>
 
                 <div class="mt-3 space-y-1">
-                    <x-responsive-nav-link :href="route('profile.edit')">
-                        {{ __('Profile Settings') }}
+                    <x-responsive-nav-link :href="route('profile.show', Auth::user()->username)">
+                        {{ __('My Profile') }}
                     </x-responsive-nav-link>
 
                     <!-- Notifications -->

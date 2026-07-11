@@ -13,22 +13,40 @@ class UserProfileController extends Controller
             ->with(['followedGames', 'badges', 'followers', 'following'])
             ->firstOrFail();
 
-        $tab = $request->input('tab', 'posts');
+        $tab = $request->input('tab', 'overview');
 
         $posts = null;
         $comments = null;
+        $overviewItems = null;
 
         if ($tab === 'comments') {
             $comments = $user->comments()
                 ->with('post')
                 ->latest()
                 ->paginate(10);
-        } else {
+        } elseif ($tab === 'posts') {
             $posts = $user->posts()
                 ->with(['game', 'category', 'tags'])
                 ->withCount(['comments', 'votes'])
                 ->latest()
                 ->paginate(10);
+        } else {
+            // Overview feed - merge latest 15 posts and 15 comments in memory
+            $latestPosts = $user->posts()
+                ->with(['game', 'category', 'tags'])
+                ->withCount(['comments', 'votes'])
+                ->latest()
+                ->take(15)
+                ->get();
+
+            $latestComments = $user->comments()
+                ->with('post')
+                ->latest()
+                ->take(15)
+                ->get();
+
+            // Interleave them chronologically
+            $overviewItems = $latestPosts->concat($latestComments)->sortByDesc('created_at')->take(10);
         }
 
         $isFollowing = auth()->check()
@@ -41,6 +59,6 @@ class UserProfileController extends Controller
             ->take(6)
             ->get();
 
-        return view('profile.show', compact('user', 'tab', 'posts', 'comments', 'isFollowing', 'mutualFollows'));
+        return view('profile.show', compact('user', 'tab', 'posts', 'comments', 'overviewItems', 'isFollowing', 'mutualFollows'));
     }
 }

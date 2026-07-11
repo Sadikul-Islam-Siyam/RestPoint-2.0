@@ -7,7 +7,7 @@
 
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-darksurface p-8 rounded-lg border border-white/5">
+            <div class="bg-white dark:bg-darksurface p-8 rounded-lg border border-gray-200 dark:border-white/5 shadow-sm transition-colors duration-150">
                 <form method="POST" action="{{ route('admin.games.update', $game->id) }}" enctype="multipart/form-data" class="space-y-6">
                     @csrf
                     @method('PUT')
@@ -19,57 +19,57 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Name -->
                         <div>
-                            <x-input-label for="name" :value="__('Game Name')" class="text-darktext" />
-                            <x-text-input id="name" name="name" type="text" class="w-full bg-darkbg text-darktext border-white/5 rounded mt-1 focus:ring-darkaccent focus:border-darkaccent" :value="old('name', $game->name)" required />
+                            <x-input-label for="name" :value="__('Game Name')" class="text-gray-700 dark:text-darktext" />
+                            <x-text-input id="name" name="name" type="text" class="w-full bg-white dark:bg-darkbg text-gray-900 dark:text-darktext border-gray-300 dark:border-white/5 rounded mt-1 focus:ring-darkaccent focus:border-darkaccent shadow-sm" :value="old('name', $game->name)" required />
                             <x-input-error :messages="$errors->get('name')" class="mt-2" />
                         </div>
 
                         <!-- Slug -->
                         <div>
-                            <x-input-label for="slug" :value="__('URL Slug (e.g. elden-ring)')" class="text-darktext" />
-                            <x-text-input id="slug" name="slug" type="text" class="w-full bg-darkbg text-darktext border-white/5 rounded mt-1 focus:ring-darkaccent focus:border-darkaccent" :value="old('slug', $game->slug)" required />
+                            <x-input-label for="slug" :value="__('URL Slug (e.g. elden-ring)')" class="text-gray-700 dark:text-darktext" />
+                            <x-text-input id="slug" name="slug" type="text" class="w-full bg-white dark:bg-darkbg text-gray-900 dark:text-darktext border-gray-300 dark:border-white/5 rounded mt-1 focus:ring-darkaccent focus:border-darkaccent shadow-sm" :value="old('slug', $game->slug)" required />
                             <x-input-error :messages="$errors->get('slug')" class="mt-2" />
                         </div>
 
                         <!-- Genre -->
                         <div>
-                            <x-input-label for="genre" :value="__('Genre')" class="text-darktext" />
-                            <x-text-input id="genre" name="genre" type="text" class="w-full bg-darkbg text-darktext border-white/5 rounded mt-1 focus:ring-darkaccent focus:border-darkaccent" :value="old('genre', $game->genre)" />
+                            <x-input-label for="genre" :value="__('Genre')" class="text-gray-700 dark:text-darktext" />
+                            <x-text-input id="genre" name="genre" type="text" class="w-full bg-white dark:bg-darkbg text-gray-900 dark:text-darktext border-gray-300 dark:border-white/5 rounded mt-1 focus:ring-darkaccent focus:border-darkaccent shadow-sm" :value="old('genre', $game->genre)" />
                             <x-input-error :messages="$errors->get('genre')" class="mt-2" />
                         </div>
 
                         <!-- Platform -->
                         <div>
-                            <x-input-label for="platform" :value="__('Platforms')" class="text-darktext" />
-                            <x-text-input id="platform" name="platform" type="text" class="w-full bg-darkbg text-darktext border-white/5 rounded mt-1 focus:ring-darkaccent focus:border-darkaccent" :value="old('platform', $game->platform)" />
+                            <x-input-label for="platform" :value="__('Platforms')" class="text-gray-700 dark:text-darktext" />
+                            <x-text-input id="platform" name="platform" type="text" class="w-full bg-white dark:bg-darkbg text-gray-900 dark:text-darktext border-gray-300 dark:border-white/5 rounded mt-1 focus:ring-darkaccent focus:border-darkaccent shadow-sm" :value="old('platform', $game->platform)" />
                             <x-input-error :messages="$errors->get('platform')" class="mt-2" />
                         </div>
 
                         <!-- Developer -->
                         <div>
-                            <x-input-label for="developer" :value="__('Developer')" class="text-darktext" />
-                            <x-text-input id="developer" name="developer" type="text" class="w-full bg-darkbg text-darktext border-white/5 rounded mt-1 focus:ring-darkaccent focus:border-darkaccent" :value="old('developer', $game->developer)" />
+                            <x-input-label for="developer" :value="__('Developer')" class="text-gray-700 dark:text-darktext" />
+                            <x-text-input id="developer" name="developer" type="text" class="w-full bg-white dark:bg-darkbg text-gray-900 dark:text-darktext border-gray-300 dark:border-white/5 rounded mt-1 focus:ring-darkaccent focus:border-darkaccent shadow-sm" :value="old('developer', $game->developer)" />
                             <x-input-error :messages="$errors->get('developer')" class="mt-2" />
                         </div>
 
                         <!-- Release Date -->
                         <div>
-                            <x-input-label for="release_date" :value="__('Release Date')" class="text-darktext" />
-                            <x-text-input id="release_date" name="release_date" type="date" class="w-full bg-darkbg text-darktext border-white/5 rounded mt-1 focus:ring-darkaccent focus:border-darkaccent" :value="old('release_date', $game->release_date)" />
+                            <x-input-label for="release_date" :value="__('Release Date')" class="text-gray-700 dark:text-darktext" />
+                            <x-text-input id="release_date" name="release_date" type="date" class="w-full bg-white dark:bg-darkbg text-gray-900 dark:text-darktext border-gray-300 dark:border-white/5 rounded mt-1 focus:ring-darkaccent focus:border-darkaccent shadow-sm" :value="old('release_date', $game->release_date)" />
                             <x-input-error :messages="$errors->get('release_date')" class="mt-2" />
                         </div>
 
                         <!-- Trailer URL -->
                         <div class="md:col-span-2">
-                            <x-input-label for="trailer_url" :value="__('YouTube Trailer URL')" class="text-darktext" />
-                            <x-text-input id="trailer_url" name="trailer_url" type="url" class="w-full bg-darkbg text-darktext border-white/5 rounded mt-1 focus:ring-darkaccent focus:border-darkaccent" :value="old('trailer_url', $game->trailer_url)" />
+                            <x-input-label for="trailer_url" :value="__('YouTube Trailer URL')" class="text-gray-700 dark:text-darktext" />
+                            <x-text-input id="trailer_url" name="trailer_url" type="url" class="w-full bg-white dark:bg-darkbg text-gray-900 dark:text-darktext border-gray-300 dark:border-white/5 rounded mt-1 focus:ring-darkaccent focus:border-darkaccent shadow-sm" :value="old('trailer_url', $game->trailer_url)" />
                             <x-input-error :messages="$errors->get('trailer_url')" class="mt-2" />
                         </div>
 
                         <!-- Cover Preview & Update -->
                         <div>
-                            <x-input-label for="cover_image_file" :value="__('Update Cover Art (File Upload)')" class="text-darktext" />
-                            <input id="cover_image_file" name="cover_image_file" type="file" class="w-full bg-darkbg text-darktext border border-white/5 rounded mt-1 p-2 focus:ring-darkaccent focus:border-darkaccent text-xs">
+                            <x-input-label for="cover_image_file" :value="__('Update Cover Art (File Upload)')" class="text-gray-700 dark:text-darktext" />
+                            <input id="cover_image_file" name="cover_image_file" type="file" class="w-full bg-white dark:bg-darkbg text-gray-900 dark:text-darktext border border-gray-300 dark:border-white/5 rounded mt-1 p-2 focus:ring-darkaccent focus:border-darkaccent text-xs">
                             <x-input-error :messages="$errors->get('cover_image_file')" class="mt-2" />
                             <div class="mt-2">
                                 @if($game->cover_image)
@@ -82,8 +82,8 @@
 
                         <!-- Banner Preview & Update -->
                         <div>
-                            <x-input-label for="banner_image_file" :value="__('Update Banner Image (File Upload)')" class="text-darktext" />
-                            <input id="banner_image_file" name="banner_image_file" type="file" class="w-full bg-darkbg text-darktext border border-white/5 rounded mt-1 p-2 focus:ring-darkaccent focus:border-darkaccent text-xs">
+                            <x-input-label for="banner_image_file" :value="__('Update Banner Image (File Upload)')" class="text-gray-700 dark:text-darktext" />
+                            <input id="banner_image_file" name="banner_image_file" type="file" class="w-full bg-white dark:bg-darkbg text-gray-900 dark:text-darktext border border-gray-300 dark:border-white/5 rounded mt-1 p-2 focus:ring-darkaccent focus:border-darkaccent text-xs">
                             <x-input-error :messages="$errors->get('banner_image_file')" class="mt-2" />
                             <div class="mt-2">
                                 @if($game->banner_image)
@@ -96,11 +96,11 @@
                     </div>
 
                     <!-- Action buttons -->
-                    <div class="flex items-center gap-4 pt-4 border-t border-white/5">
-                        <button type="submit" class="px-6 py-2.5 bg-darkaccent text-darkbg font-semibold rounded hover:opacity-90 transition duration-150 text-sm">
+                    <div class="flex items-center gap-4 pt-4 border-t border-gray-200 dark:border-white/5">
+                        <button type="submit" class="px-6 py-2.5 bg-darkaccent text-white dark:text-darkbg font-semibold rounded hover:opacity-90 transition duration-150 text-sm shadow-sm">
                             Update Game Listing
                         </button>
-                        <a href="{{ route('admin.games.index') }}" class="text-sm text-darkmuted hover:text-darktext">
+                        <a href="{{ route('admin.games.index') }}" class="text-sm text-gray-500 dark:text-darkmuted hover:text-gray-900 dark:hover:text-darktext">
                             Cancel
                         </a>
                     </div>

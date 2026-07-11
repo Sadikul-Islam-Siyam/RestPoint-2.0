@@ -20,5 +20,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         \App\Models\Post::observe(\App\Observers\PostObserver::class);
+
+        // Share games for left sidebar globally in the main layout
+        \Illuminate\Support\Facades\View::composer('layouts.app', function ($view) {
+            $sidebarGames = \App\Models\Game::withCount('followers')->orderBy('name')->get();
+            $followedGames = auth()->check() ? auth()->user()->followedGames()->get() : collect();
+            $view->with(compact('sidebarGames', 'followedGames'));
+        });
     }
 }

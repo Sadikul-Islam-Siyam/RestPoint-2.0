@@ -27,6 +27,7 @@ class GameController extends Controller
 
     public function show(Game $game, Request $request)
     {
+        $game->load('gameLinks');
         $categories = $game->categories;
         
         $postsQuery = Post::where('game_id', $game->id)

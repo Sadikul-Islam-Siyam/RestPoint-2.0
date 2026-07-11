@@ -33,7 +33,7 @@
             <!-- Main Post Card -->
             <div class="bg-white dark:bg-darksurface p-8 rounded-lg border border-gray-200 dark:border-white/5 space-y-4 shadow-sm transition-colors duration-150">
                 <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-darkmuted flex-wrap">
-                    <span>Posted by <strong>{{ $post->user->username }}</strong></span>
+                    <span>Posted by <a href="{{ route('profile.show', $post->user->username) }}" class="font-bold text-darkaccent hover:underline">{{ $post->user->username }}</a></span>
                     <span>&bull;</span>
                     <span>{{ $post->created_at->diffForHumans() }}</span>
                     @if($post->category)
@@ -152,7 +152,7 @@
                             <div x-data="{ open: false }" class="bg-white dark:bg-darksurface p-6 rounded-lg border {{ $comment->is_accepted ? 'border-green-500 bg-green-50 dark:bg-green-950/10' : 'border-gray-200 dark:border-white/5' }} space-y-3 shadow-sm transition-colors duration-150">
                                 <div class="flex justify-between items-start flex-wrap gap-2 text-xs text-gray-500 dark:text-darkmuted">
                                     <div class="flex items-center gap-2">
-                                        <strong class="text-gray-900 dark:text-darktext">{{ $comment->user->username }}</strong>
+                                        <a href="{{ route('profile.show', $comment->user->username) }}" class="font-bold text-gray-900 dark:text-darktext hover:text-darkaccent transition">{{ $comment->user->username }}</a>
                                         <span>&bull;</span>
                                         <span>{{ $comment->created_at->diffForHumans() }}</span>
                                         @if($comment->is_accepted)
@@ -236,7 +236,7 @@
                                         <div class="bg-gray-100 dark:bg-darksurface/60 p-5 rounded-lg border border-gray-200 dark:border-white/5 space-y-2 shadow-sm transition-colors duration-150">
                                             <div class="flex justify-between items-center text-xs text-gray-500 dark:text-darkmuted flex-wrap">
                                                 <div class="flex items-center gap-2">
-                                                    <strong class="text-gray-900 dark:text-darktext">{{ $reply->user->username }}</strong>
+                                                    <a href="{{ route('profile.show', $reply->user->username) }}" class="font-bold text-gray-900 dark:text-darktext hover:text-darkaccent transition">{{ $reply->user->username }}</a>
                                                     <span>&bull;</span>
                                                     <span>{{ $reply->created_at->diffForHumans() }}</span>
                                                 </div>

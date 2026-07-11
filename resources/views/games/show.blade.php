@@ -44,37 +44,106 @@
                 <!-- Left Sidebar: Game Info -->
                 <div class="lg:col-span-1 space-y-6">
                     <div class="bg-white dark:bg-darksurface p-6 rounded-lg border border-gray-200 dark:border-white/5 space-y-4 shadow-sm transition-colors duration-150">
-                        @if($game->banner_image)
-                            <img src="{{ $game->banner_image }}" alt="{{ $game->name }} banner" class="w-full h-32 object-cover rounded">
+                        @if($game->cover_image)
+                            <img src="{{ $game->cover_image }}" alt="{{ $game->name }} cover" class="w-full h-40 object-cover rounded shadow-sm">
                         @endif
-                        <h3 class="font-serif text-lg font-bold text-darkaccent">Game Directory</h3>
                         
-                        <div class="space-y-2 text-sm text-gray-900 dark:text-darktext">
+                        <h3 class="font-serif text-lg font-bold text-darkaccent border-b border-gray-100 dark:border-white/5 pb-2">Game Directory</h3>
+
+                        <!-- Live Ratings -->
+                        @if($game->metacritic || $game->rating)
+                            <div class="grid grid-cols-2 gap-3">
+                                @if($game->metacritic)
+                                    @php
+                                        $metaColor = 'bg-red-600';
+                                        if ($game->metacritic >= 90) {
+                                            $metaColor = 'bg-emerald-600';
+                                        } elseif ($game->metacritic >= 75) {
+                                            $metaColor = 'bg-green-600';
+                                        } elseif ($game->metacritic >= 50) {
+                                            $metaColor = 'bg-yellow-500';
+                                        }
+                                    @endphp
+                                    <div class="flex items-center gap-2 p-2 rounded bg-gray-50 dark:bg-darkbg/40 border border-gray-100 dark:border-white/[0.02]">
+                                        <span class="{{ $metaColor }} text-white font-bold w-9 h-9 rounded flex items-center justify-center text-sm font-sans shrink-0 shadow-sm">{{ $game->metacritic }}</span>
+                                        <div>
+                                            <span class="text-[10px] text-gray-500 dark:text-darkmuted block uppercase font-semibold">Metascore</span>
+                                            <span class="text-[10px] font-medium text-gray-400">Critical review</span>
+                                        </div>
+                                    </div>
+                                @endif
+                                @if($game->rating)
+                                    <div class="flex items-center gap-2 p-2 rounded bg-gray-50 dark:bg-darkbg/40 border border-gray-100 dark:border-white/[0.02]">
+                                        <span class="text-amber-500 font-bold w-9 h-9 rounded bg-amber-500/10 flex items-center justify-center text-lg shrink-0">★</span>
+                                        <div>
+                                            <span class="text-[10px] text-gray-500 dark:text-darkmuted block uppercase font-semibold">Rating</span>
+                                            <span class="text-xs font-bold text-gray-700 dark:text-darktext">{{ number_format($game->rating, 2) }}</span>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
+
+                        <!-- Genres Pills -->
+                        @if($game->genre)
+                            <div class="flex flex-wrap gap-1.5 pt-1">
+                                @foreach(explode(', ', $game->genre) as $g)
+                                    <span class="px-2.5 py-0.5 text-[10px] font-semibold bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-darktext border border-gray-200 dark:border-white/5 rounded-full">{{ $g }}</span>
+                                @endforeach
+                            </div>
+                        @endif
+                        
+                        <div class="space-y-2 text-sm text-gray-900 dark:text-darktext pt-2">
                             <div>
                                 <span class="text-gray-500 dark:text-darkmuted block text-xs">Platforms</span>
-                                <strong>{{ $game->platform }}</strong>
+                                <strong class="text-xs">{{ $game->platform }}</strong>
                             </div>
                             <div>
                                 <span class="text-gray-500 dark:text-darkmuted block text-xs">Release Date</span>
-                                <strong>{{ $game->release_date }}</strong>
+                                <strong class="text-xs">{{ $game->release_date }}</strong>
                             </div>
                             <div>
                                 <span class="text-gray-500 dark:text-darkmuted block text-xs">Developer</span>
-                                <strong>{{ $game->developer }}</strong>
+                                <strong class="text-xs">{{ $game->developer }}</strong>
                             </div>
                         </div>
 
+                        <!-- Hub Description -->
+                        @if($game->description)
+                            <div class="pt-3 border-t border-gray-200 dark:border-white/5 space-y-1">
+                                <span class="text-gray-500 dark:text-darkmuted block text-xs">About</span>
+                                <div class="text-xs text-gray-600 dark:text-darktext leading-relaxed max-h-28 overflow-y-auto pr-1 scrollbar-thin">
+                                    {{ Str::limit($game->description, 280) }}
+                                </div>
+                            </div>
+                        @endif
+
                         <!-- Hub Stats -->
-                        <div class="pt-4 border-t border-gray-200 dark:border-white/5 grid grid-cols-2 gap-4 text-center">
+                        <div class="pt-3 border-t border-gray-200 dark:border-white/5 grid grid-cols-2 gap-4 text-center">
                             <div>
-                                <span class="text-2xl font-bold text-darkaccent block">{{ $stats['posts_count'] }}</span>
-                                <span class="text-xs text-gray-500 dark:text-darkmuted">Posts</span>
+                                <span class="text-xl font-bold text-darkaccent block">{{ $stats['posts_count'] }}</span>
+                                <span class="text-[10px] text-gray-500 dark:text-darkmuted">Posts</span>
                             </div>
                             <div>
-                                <span id="follower_count" class="text-2xl font-bold text-darkaccent block">{{ $stats['followers_count'] }}</span>
-                                <span class="text-xs text-gray-500 dark:text-darkmuted">Followers</span>
+                                <span id="follower_count" class="text-xl font-bold text-darkaccent block">{{ $stats['followers_count'] }}</span>
+                                <span class="text-[10px] text-gray-500 dark:text-darkmuted">Followers</span>
                             </div>
                         </div>
+
+                        <!-- Store Links -->
+                        @if($game->gameLinks->isNotEmpty())
+                            <div class="pt-3 border-t border-gray-200 dark:border-white/5 space-y-2">
+                                <span class="text-gray-500 dark:text-darkmuted block text-xs">Buy or Play</span>
+                                <div class="flex flex-col gap-1.5">
+                                    @foreach($game->gameLinks as $link)
+                                        <a href="{{ $link->url }}" target="_blank" class="flex items-center gap-2 text-xs text-darkaccent hover:underline font-medium">
+                                            <span>🛒</span>
+                                            <span>Get on {{ $link->store_name }}</span>
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
                     </div>
 
                     @if($game->trailer_url)
@@ -128,7 +197,7 @@
 
                                     <div class="flex-grow space-y-2">
                                         <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-darkmuted flex-wrap">
-                                            <span>Posted by <strong>{{ $post->user->username }}</strong></span>
+                                            <span>Posted by <a href="{{ route('profile.show', $post->user->username) }}" class="font-bold text-darkaccent hover:underline">{{ $post->user->username }}</a></span>
                                             <span>&bull;</span>
                                             <span>{{ $post->created_at->diffForHumans() }}</span>
                                             @if($post->category)

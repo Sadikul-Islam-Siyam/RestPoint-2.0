@@ -20,6 +20,9 @@ return new class extends Migration
             $table->string('developer')->nullable();
             $table->date('release_date')->nullable();
             $table->unsignedBigInteger('external_api_id')->nullable();
+            $table->integer('metacritic')->nullable();
+            $table->decimal('rating', 3, 2)->nullable();
+            $table->text('description')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });

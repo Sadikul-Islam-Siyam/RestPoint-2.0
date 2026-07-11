@@ -28,10 +28,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 if (data.following) {
-                    btn.textContent = 'Unfollow Game';
+                    const txt = btn.textContent.trim();
+                    if (txt === 'Follow' || txt === 'Following') {
+                        btn.textContent = 'Following';
+                    } else if (txt === 'Join' || txt === 'Joined') {
+                        btn.textContent = 'Joined';
+                    } else {
+                        btn.textContent = 'Unfollow Game';
+                    }
                     btn.classList.add('bg-darkaccent/10');
                 } else {
-                    btn.textContent = 'Follow Game';
+                    const txt = btn.textContent.trim();
+                    if (txt === 'Following' || txt === 'Follow') {
+                        btn.textContent = 'Follow';
+                    } else if (txt === 'Joined' || txt === 'Join') {
+                        btn.textContent = 'Join';
+                    } else {
+                        btn.textContent = 'Follow Game';
+                    }
                     btn.classList.remove('bg-darkaccent/10');
                 }
 
@@ -79,10 +93,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if (data.following) {
                     btn.textContent = 'Unfollow';
-                    btn.classList.add('bg-white/10');
+                    btn.classList.add('opacity-50');
                 } else {
                     btn.textContent = 'Follow';
-                    btn.classList.remove('bg-white/10');
+                    btn.classList.remove('opacity-50');
                 }
 
                 const userFollowerCountEl = document.getElementById('user_follower_count');

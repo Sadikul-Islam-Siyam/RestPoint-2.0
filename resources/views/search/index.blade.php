@@ -9,60 +9,129 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
             <!-- Search Filter Card -->
             <div class="bg-white dark:bg-darksurface p-6 rounded-lg border border-gray-200 dark:border-white/5 shadow-sm transition-colors duration-150">
-                <form method="GET" action="{{ route('search') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <!-- Text Query -->
-                    <div class="md:col-span-2">
-                        <label for="q" class="block text-xs font-semibold text-gray-500 dark:text-darkmuted mb-1 uppercase">Keywords</label>
-                        <input id="q" name="q" type="text" value="{{ request('q') }}" placeholder="Search title or content..." class="w-full bg-gray-50 dark:bg-darkbg text-gray-900 dark:text-darktext border-gray-300 dark:border-white/5 rounded text-sm focus:ring-darkaccent focus:border-darkaccent shadow-sm">
+                <form method="GET" action="{{ route('search') }}" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <!-- Text Query -->
+                        <div class="md:col-span-2">
+                            <label for="q" class="block text-xs font-semibold text-gray-500 dark:text-darkmuted mb-1 uppercase">Keywords</label>
+                            <input id="q" name="q" type="text" value="{{ request('q') }}" placeholder="Search title or content..." class="w-full bg-gray-50 dark:bg-darkbg text-gray-900 dark:text-darktext border-gray-300 dark:border-white/5 rounded text-sm focus:ring-darkaccent focus:border-darkaccent shadow-sm">
+                        </div>
+
+                        <!-- Game Selector -->
+                        <div>
+                            <label for="game_id" class="block text-xs font-semibold text-gray-500 dark:text-darkmuted mb-1 uppercase">Game Library</label>
+                            <select id="game_id" name="game_id" class="w-full bg-gray-50 dark:bg-darkbg text-gray-900 dark:text-darktext border-gray-300 dark:border-white/5 rounded text-sm focus:ring-darkaccent focus:border-darkaccent shadow-sm">
+                                <option value="">All Games</option>
+                                @foreach($games as $game)
+                                    <option value="{{ $game->id }}" {{ request('game_id') == $game->id ? 'selected' : '' }}>{{ $game->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Hidden Tag Field -->
+                        <input type="hidden" name="tag" id="tag_input" value="{{ request('tag') }}">
+
+                        <!-- Post Type Selector -->
+                        <div>
+                            <label for="type" class="block text-xs font-semibold text-gray-500 dark:text-darkmuted mb-1 uppercase">Post Type</label>
+                            <select id="type" name="type" class="w-full bg-gray-50 dark:bg-darkbg text-gray-900 dark:text-darktext border-gray-300 dark:border-white/5 rounded text-sm focus:ring-darkaccent focus:border-darkaccent shadow-sm">
+                                <option value="">All Types</option>
+                                <option value="discussion" {{ request('type') === 'discussion' ? 'selected' : '' }}>Discussion</option>
+                                <option value="help" {{ request('type') === 'help' ? 'selected' : '' }}>Help Request</option>
+                            </select>
+                        </div>
+
+                        <!-- Solved Selector -->
+                        <div>
+                            <label for="solved" class="block text-xs font-semibold text-gray-500 dark:text-darkmuted mb-1 uppercase">Solved Status</label>
+                            <select id="solved" name="solved" class="w-full bg-gray-50 dark:bg-darkbg text-gray-900 dark:text-darktext border-gray-300 dark:border-white/5 rounded text-sm focus:ring-darkaccent focus:border-darkaccent shadow-sm">
+                                <option value="">All Statuses</option>
+                                <option value="1" {{ request('solved') === '1' ? 'selected' : '' }}>Solved</option>
+                                <option value="0" {{ request('solved') === '0' ? 'selected' : '' }}>Unsolved</option>
+                            </select>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="md:col-span-2 flex items-end gap-3">
+                            <button type="submit" class="w-full py-2 bg-darkaccent text-white dark:text-darkbg font-semibold rounded hover:opacity-90 transition duration-150 text-sm shadow-sm">
+                                Apply Filters
+                            </button>
+                            <a href="{{ route('search') }}" class="w-full py-2 bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-darktext font-semibold rounded hover:bg-gray-200 dark:hover:bg-white/10 transition duration-150 text-center text-sm shadow-sm border border-gray-200 dark:border-white/5">
+                                Reset
+                            </a>
+                        </div>
                     </div>
 
-                    <!-- Game Selector -->
-                    <div>
-                        <label for="game_id" class="block text-xs font-semibold text-gray-500 dark:text-darkmuted mb-1 uppercase">Game Library</label>
-                        <select id="game_id" name="game_id" class="w-full bg-gray-50 dark:bg-darkbg text-gray-900 dark:text-darktext border-gray-300 dark:border-white/5 rounded text-sm focus:ring-darkaccent focus:border-darkaccent shadow-sm">
-                            <option value="">All Games</option>
-                            @foreach($games as $game)
-                                <option value="{{ $game->id }}" {{ request('game_id') == $game->id ? 'selected' : '' }}>{{ $game->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <!-- Tag Filter -->
-                    <div>
-                        <label for="tag" class="block text-xs font-semibold text-gray-500 dark:text-darkmuted mb-1 uppercase">Filter by Tag</label>
-                        <input id="tag" name="tag" type="text" value="{{ request('tag') }}" placeholder="e.g. strategy" class="w-full bg-gray-50 dark:bg-darkbg text-gray-900 dark:text-darktext border-gray-300 dark:border-white/5 rounded text-sm focus:ring-darkaccent focus:border-darkaccent shadow-sm">
-                    </div>
-
-                    <!-- Post Type Selector -->
-                    <div>
-                        <label for="type" class="block text-xs font-semibold text-gray-500 dark:text-darkmuted mb-1 uppercase">Post Type</label>
-                        <select id="type" name="type" class="w-full bg-gray-50 dark:bg-darkbg text-gray-900 dark:text-darktext border-gray-300 dark:border-white/5 rounded text-sm focus:ring-darkaccent focus:border-darkaccent shadow-sm">
-                            <option value="">All Types</option>
-                            <option value="discussion" {{ request('type') === 'discussion' ? 'selected' : '' }}>Discussion</option>
-                            <option value="help" {{ request('type') === 'help' ? 'selected' : '' }}>Help Request</option>
-                        </select>
-                    </div>
-
-                    <!-- Solved Selector -->
-                    <div>
-                        <label for="solved" class="block text-xs font-semibold text-gray-500 dark:text-darkmuted mb-1 uppercase">Solved Status</label>
-                        <select id="solved" name="solved" class="w-full bg-gray-50 dark:bg-darkbg text-gray-900 dark:text-darktext border-gray-300 dark:border-white/5 rounded text-sm focus:ring-darkaccent focus:border-darkaccent shadow-sm">
-                            <option value="">All Statuses</option>
-                            <option value="1" {{ request('solved') === '1' ? 'selected' : '' }}>Solved</option>
-                            <option value="0" {{ request('solved') === '0' ? 'selected' : '' }}>Unsolved</option>
-                        </select>
-                    </div>
-
-                    <!-- Actions -->
-                    <div class="md:col-span-2 flex items-end gap-3">
-                        <button type="submit" class="w-full py-2 bg-darkaccent text-white dark:text-darkbg font-semibold rounded hover:opacity-90 transition duration-150 text-sm shadow-sm">
-                            Apply Filters
-                        </button>
-                        <a href="{{ route('search') }}" class="w-full py-2 bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-darktext font-semibold rounded hover:bg-gray-200 dark:hover:bg-white/10 transition duration-150 text-center text-sm shadow-sm border border-gray-200 dark:border-white/5">
-                            Reset
-                        </a>
+                    <!-- Clickable Tag Selection Row -->
+                    <div class="pt-4 border-t border-gray-100 dark:border-white/5">
+                        <span class="block text-xs font-semibold text-gray-500 dark:text-darkmuted mb-2 uppercase">Filter by Tag</span>
+                        <div id="search_tags_container" class="flex flex-wrap gap-2 p-3 bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/5 rounded min-h-[44px] items-center">
+                            <!-- JS will dynamically render tags here -->
+                        </div>
                     </div>
                 </form>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const gameSelect = document.getElementById('game_id');
+                        const tagInput = document.getElementById('tag_input');
+                        const tagsContainer = document.getElementById('search_tags_container');
+
+                        const gamesTags = @json($games->mapWithKeys(fn($g) => [$g->id => $g->tags]));
+                        const allTags = @json($allTags);
+                        let selectedTag = "{{ request('tag') }}";
+
+                        function renderSearchTags(gameId) {
+                            tagsContainer.innerHTML = '';
+                            
+                            let tags = [];
+                            if (!gameId) {
+                                tags = allTags;
+                            } else {
+                                tags = gamesTags[gameId] || [];
+                            }
+
+                            if (tags.length === 0) {
+                                tagsContainer.innerHTML = '<span class="text-xs text-gray-400 dark:text-darkmuted">No tags available for current selections.</span>';
+                                return;
+                            }
+
+                            tags.forEach(tag => {
+                                const isActive = (tag.slug === selectedTag || tag.name === selectedTag);
+                                
+                                const pill = document.createElement('button');
+                                pill.type = 'button';
+                                pill.className = `px-3 py-1.5 rounded-full border text-xs font-semibold select-none cursor-pointer transition-all duration-150 ` +
+                                    (isActive 
+                                        ? 'bg-darkaccent border-darkaccent text-white dark:text-darkbg shadow-sm font-bold animate-pulse' 
+                                        : 'bg-white dark:bg-darkbg border-gray-200 dark:border-white/5 text-gray-600 dark:text-darktext hover:bg-gray-50 dark:hover:bg-white/[0.02]');
+                                
+                                pill.textContent = tag.name;
+
+                                pill.addEventListener('click', function () {
+                                    if (isActive) {
+                                        selectedTag = '';
+                                        tagInput.value = '';
+                                    } else {
+                                        selectedTag = tag.slug;
+                                        tagInput.value = tag.slug;
+                                    }
+                                    tagsContainer.closest('form').submit();
+                                });
+
+                                tagsContainer.appendChild(pill);
+                            });
+                        }
+
+                        renderSearchTags(gameSelect.value);
+
+                        gameSelect.addEventListener('change', function () {
+                            selectedTag = '';
+                            tagInput.value = '';
+                            renderSearchTags(this.value);
+                        });
+                    });
+                </script>
             </div>
 
             <!-- Results Listing -->

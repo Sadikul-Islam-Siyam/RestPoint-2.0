@@ -44,6 +44,9 @@ class GameManagementController extends Controller
             'cover_image' => 'nullable|string',
             'banner_image' => 'nullable|string',
             'external_api_id' => 'nullable|integer',
+            'metacritic' => 'nullable|integer|min:0|max:100',
+            'rating' => 'nullable|numeric|min:0|max:5',
+            'description' => 'nullable|string',
         ]);
 
         $data = $validated;
@@ -110,6 +113,30 @@ class GameManagementController extends Controller
             ]);
         }
 
+        // Seed default tags for this game
+        $defaultTags = [
+            ['name' => 'Boss Guide', 'slug' => 'boss-guide'],
+            ['name' => 'Builds', 'slug' => 'builds'],
+            ['name' => 'Lore', 'slug' => 'lore'],
+            ['name' => 'Multiplayer', 'slug' => 'multiplayer'],
+            ['name' => 'Beginner Tips', 'slug' => 'beginner-tips'],
+            ['name' => 'Item Location', 'slug' => 'item-location'],
+            ['name' => 'Speedrun', 'slug' => 'speedrun'],
+            ['name' => 'Mods', 'slug' => 'mods'],
+            ['name' => 'Glitches', 'slug' => 'glitches'],
+            ['name' => 'Review', 'slug' => 'review'],
+            ['name' => 'News', 'slug' => 'news'],
+            ['name' => 'Updates', 'slug' => 'updates'],
+        ];
+
+        foreach ($defaultTags as $dt) {
+            \App\Models\Tag::create([
+                'game_id' => $game->id,
+                'name' => $dt['name'],
+                'slug' => $dt['slug'],
+            ]);
+        }
+
         return redirect()->route('admin.games.index')->with('success', 'Game created successfully!');
     }
 
@@ -133,6 +160,9 @@ class GameManagementController extends Controller
             'cover_image' => 'nullable|string',
             'banner_image' => 'nullable|string',
             'external_api_id' => 'nullable|integer',
+            'metacritic' => 'nullable|integer|min:0|max:100',
+            'rating' => 'nullable|numeric|min:0|max:5',
+            'description' => 'nullable|string',
         ]);
 
         $data = $validated;

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['name', 'slug', 'cover_image', 'banner_image', 'trailer_url', 'genre', 'platform', 'developer', 'release_date', 'external_api_id', 'created_by'])]
+#[Fillable(['name', 'slug', 'cover_image', 'banner_image', 'trailer_url', 'genre', 'platform', 'developer', 'release_date', 'external_api_id', 'metacritic', 'rating', 'description', 'created_by'])]
 class Game extends Model
 {
     use HasFactory;

@@ -98,6 +98,16 @@ class CommentController extends Controller
         }
 
         $postId = $comment->post_id;
+
+        // Reset post is_solved status if the deleted comment was the solution
+        if ($comment->is_accepted) {
+            $post = $comment->post;
+            if ($post) {
+                $post->is_solved = false;
+                $post->save();
+            }
+        }
+
         $comment->delete();
 
         return redirect()->route('posts.show', $postId)->with('success', 'Comment deleted!');

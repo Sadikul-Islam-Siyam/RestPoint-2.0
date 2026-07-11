@@ -48,8 +48,9 @@ class SearchController extends Controller
         }
 
         $posts = $query->latest()->paginate(15)->withQueryString();
-        $games = Game::all();
+        $games = Game::with('tags')->get();
+        $allTags = \App\Models\Tag::select('name', 'slug')->distinct()->get();
 
-        return view('search.index', compact('posts', 'games'));
+        return view('search.index', compact('posts', 'games', 'allTags'));
     }
 }

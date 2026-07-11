@@ -38,7 +38,7 @@ class PostController extends Controller
         if ($request->filled('game')) {
             $selectedGame = Game::findOrFail($request->game);
         }
-        $games = Game::all();
+        $games = Game::with('tags')->get();
         return view('posts.create', compact('games', 'selectedGame'));
     }
 
@@ -49,7 +49,8 @@ class PostController extends Controller
             'type' => 'required|in:help,discussion',
             'title' => 'required|string|max:255',
             'body' => 'required|string',
-            'tags' => 'nullable|string',
+            'tags' => 'nullable|array',
+            'tags.*' => 'exists:tags,id',
             'is_spoiler' => 'nullable|boolean',
         ]);
 
@@ -62,19 +63,9 @@ class PostController extends Controller
         $post->user_id = auth()->id();
         $post->save();
 
-        // Handle Tags (Comma separated list)
-        if ($request->filled('tags')) {
-            $tagNames = array_filter(array_map('trim', explode(',', $request->tags)));
-            $tagIds = [];
-            foreach ($tagNames as $name) {
-                $slug = Str::slug($name);
-                $tag = Tag::firstOrCreate(
-                    ['game_id' => $post->game_id, 'slug' => $slug],
-                    ['name' => $name]
-                );
-                $tagIds[] = $tag->id;
-            }
-            $post->tags()->sync($tagIds);
+        // Handle Tags (Selectable list)
+        if ($request->has('tags')) {
+            $post->tags()->sync($request->input('tags') ?? []);
         }
 
         // Award XP and check badges
@@ -86,8 +77,9 @@ class PostController extends Controller
     public function edit(Post $post)
     {
         $this->authorizeOwner($post);
-        $games = Game::all();
-        return view('posts.edit', compact('post', 'games'));
+        $games = Game::with('tags')->get();
+        $selectedGame = $post->game;
+        return view('posts.edit', compact('post', 'games', 'selectedGame'));
     }
 
     public function update(Request $request, Post $post)
@@ -97,7 +89,8 @@ class PostController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'body' => 'required|string',
-            'tags' => 'nullable|string',
+            'tags' => 'nullable|array',
+            'tags.*' => 'exists:tags,id',
             'is_spoiler' => 'nullable|boolean',
         ]);
 
@@ -107,17 +100,9 @@ class PostController extends Controller
         $post->save();
 
         if ($request->has('tags')) {
-            $tagNames = array_filter(array_map('trim', explode(',', $request->tags)));
-            $tagIds = [];
-            foreach ($tagNames as $name) {
-                $slug = Str::slug($name);
-                $tag = Tag::firstOrCreate(
-                    ['game_id' => $post->game_id, 'slug' => $slug],
-                    ['name' => $name]
-                );
-                $tagIds[] = $tag->id;
-            }
-            $post->tags()->sync($tagIds);
+            $post->tags()->sync($request->input('tags') ?? []);
+        } else {
+            $post->tags()->detach();
         }
 
         return redirect()->route('posts.show', $post->id)->with('success', 'Post updated successfully!');

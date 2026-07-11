@@ -25,7 +25,12 @@ class AutoCategoryService
         // Extract tags string from request input or model relations
         $tagsString = '';
         if (request()->has('tags')) {
-            $tagsString = strtolower(request()->input('tags') ?? '');
+            $tagIds = request()->input('tags');
+            if (is_array($tagIds)) {
+                $tagsString = strtolower(\App\Models\Tag::whereIn('id', $tagIds)->pluck('name')->implode(','));
+            } else {
+                $tagsString = strtolower($tagIds ?? '');
+            }
         } elseif ($post->relationLoaded('tags')) {
             $tagsString = strtolower($post->tags->pluck('name')->implode(','));
         }

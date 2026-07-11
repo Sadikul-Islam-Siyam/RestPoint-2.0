@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Route;
 
 // Welcome & Dashboard
 Route::get('/', function () {
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
     return redirect()->route('games.index');
 })->name('home');
 
@@ -18,7 +21,8 @@ Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'ind
 Route::get('/games', [GameController::class, 'index'])->name('games.index');
 Route::get('/games/{game:slug}', [GameController::class, 'show'])->name('games.show');
 Route::get('/users/{username}', [\App\Http\Controllers\UserProfileController::class, 'show'])->name('profile.show');
-Route::get('/search', [\App\Http\Controllers\SearchController::class, 'index'])->name('search');
+Route::get('/search', [\App\Http\Controllers\DashboardController::class, 'index'])->name('search');
+Route::get('/api/search/suggestions', [\App\Http\Controllers\SearchDropdownController::class, 'index'])->name('api.search.suggestions');
 
 // Authenticated Interaction (Requires login)
 Route::middleware('auth')->group(function () {
