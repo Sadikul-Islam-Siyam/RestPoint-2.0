@@ -125,10 +125,10 @@
                 </button>
 
                 @auth
-                    <!-- Global Create Post Button -->
-                    <a href="{{ route('posts.create') }}" class="flex items-center gap-1 px-3 py-1.5 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/10 text-gray-700 dark:text-darktext text-xs font-bold rounded-full transition shadow-sm shrink-0">
+                    <!-- Global Create Button (Admins add a game, other users create a post) -->
+                    <a href="{{ auth()->user()->role === 'admin' ? route('admin.games.create') : route('posts.create') }}" class="flex items-center gap-1 px-3 py-1.5 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/10 text-gray-700 dark:text-darktext text-xs font-bold rounded-full transition shadow-sm shrink-0">
                         <span class="text-sm font-semibold">+</span>
-                        <span>Create</span>
+                        <span>{{ auth()->user()->role === 'admin' ? 'Add Game' : 'Create' }}</span>
                     </a>
 
                     <!-- Notification Bell Dropdown -->
