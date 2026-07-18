@@ -1,58 +1,127 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
-
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="public/favicon.ico" alt="RestPoint Logo" width="100" />
 </p>
 
-## About Laravel
+<h1 align="center">RestPoint</h1>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+<p align="center">
+  <strong>The Ultimate Community Hub for Gamers</strong>
+</p>
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+<p align="center">
+  RestPoint is a modern, responsive web application built for gaming communities. It serves as a unified tavern where players can gather, discuss boss strategies, share builds, read the latest gaming news, and vote on the best community content. Built on top of the robust Laravel framework with a sleek Tailwind CSS interface.
+</p>
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🌟 Features
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 🎮 Game Hubs (Communities)
+- **Centralized Game Directories:** Each game has its own dedicated hub.
+- **Categorized Discussions:** Browse posts by categories like *Boss Strategy*, *Builds & Loadouts*, *Item Locations*, *Lore & Story*, and more.
+- **Tags & Filters:** Filter posts efficiently by category, tag, or sort by newest/popular.
+- **Dynamic Data:** Integrates with the RAWG API to dynamically seed real game data, genres, and platforms.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 📰 Tavern News Hub
+- **Live News Aggregator:** Pulls real-time RSS feeds from IGN, GameSpot, and PC Gamer into a beautifully formatted, unified timeline.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### 🔥 Popular Highlights
+- **Weekly Trending:** Automatically calculates an activity score based on upvotes and replies to highlight the hottest community discussions of the week.
+- **Voting System:** Upvote/Downvote functionality on both posts and comments.
 
-## Agentic Development
+### 🎲 Explore & Discover
+- **Tavern Roulette:** Don't know what to play? Let the Tavern spin a random game community for you to explore!
+- **Top Adventurers Leaderboard:** Spotlights the most active contributors based on their total thread creations and replies.
+- **Follow System:** Join game hubs to have them appear on your personalized dashboard.
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### 🛡️ Moderation & User Accounts
+- **Profiles:** Customizable user profiles with dynamic statistics and avatars.
+- **Roles:** Includes User, Moderator, and Admin roles.
+- **Admin Dashboard:** Moderators can review user reports, ban offenders, and manage community integrity.
 
-```bash
-composer require laravel/boost --dev
+---
 
-php artisan boost:install
-```
+## 🛠️ Technology Stack
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+- **Backend:** Laravel (PHP)
+- **Frontend:** Blade Templates, Tailwind CSS, Alpine.js
+- **Database:** MySQL / SQLite
+- **Asset Bundling:** Vite
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 🚀 Getting Started
 
-## Code of Conduct
+Follow these instructions to get a copy of the project up and running on your local machine for development and testing.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Prerequisites
 
-## Security Vulnerabilities
+- PHP >= 8.2
+- Composer
+- Node.js & npm
+- A relational database (MySQL, PostgreSQL, or SQLite)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Installation
 
-## License
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Sadikul-Islam-Siyam/RestPoint.git
+   cd RestPoint
+   ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+2. **Install PHP dependencies:**
+   ```bash
+   composer install
+   ```
+
+3. **Install NPM dependencies:**
+   ```bash
+   npm install
+   ```
+
+4. **Environment Setup:**
+   Copy the `.env.example` file and configure your environment variables:
+   ```bash
+   cp .env.example .env
+   ```
+   *Make sure to update your `DB_DATABASE`, `DB_USERNAME`, and `DB_PASSWORD` variables.*
+
+5. **Generate Application Key:**
+   ```bash
+   php artisan key:generate
+   ```
+
+6. **Run Migrations & Seed the Database:**
+   This command will run all database migrations and seed the initial `Grandmaster Admin` account alongside the RAWG game library data.
+   ```bash
+   php artisan migrate:fresh --seed
+   ```
+
+7. **Compile Assets:**
+   ```bash
+   npm run dev
+   ```
+
+8. **Start the Development Server:**
+   ```bash
+   php artisan serve
+   ```
+
+You can now access the application at `http://localhost:8000`.
+
+### Admin Access
+The seeder provisions a default admin account:
+- **Email:** `admin@questhive.com`
+- **Password:** `password`
+
+---
+
+## 📸 Screenshots
+
+*(To add screenshots later, place images in the `/public/images` directory and reference them here!)*
+
+---
+
+## 🛡️ License
+
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

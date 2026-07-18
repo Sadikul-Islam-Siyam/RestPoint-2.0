@@ -51,8 +51,8 @@ class Comment extends Model
 
     public function getFormattedBodyAttribute(): string
     {
-        // Prevent XSS since comments don't use Trix
-        $body = e($this->body);
+        // Safe whitelist for rich text formatting in Trix editor comments
+        $body = strip_tags($this->body, ['div', 'strong', 'em', 'pre', 'code', 'a', 'ul', 'ol', 'li', 'br', 'span']);
 
         // Spoiler markup: ||spoiler||
         $body = preg_replace(

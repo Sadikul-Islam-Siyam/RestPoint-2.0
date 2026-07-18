@@ -24,6 +24,12 @@ Route::get('/users/{username}', [\App\Http\Controllers\UserProfileController::cl
 Route::get('/search', [\App\Http\Controllers\DashboardController::class, 'index'])->name('search');
 Route::get('/api/search/suggestions', [\App\Http\Controllers\SearchDropdownController::class, 'index'])->name('api.search.suggestions');
 
+// Popular, News, and Explore channels
+Route::get('/popular', [\App\Http\Controllers\PopularController::class, 'index'])->name('popular');
+Route::get('/news', [\App\Http\Controllers\NewsController::class, 'index'])->name('news');
+Route::get('/explore', [\App\Http\Controllers\ExploreController::class, 'index'])->name('explore');
+Route::get('/explore/roulette', [\App\Http\Controllers\ExploreController::class, 'roulette'])->name('explore.roulette');
+
 // Authenticated Interaction (Requires login)
 Route::middleware('auth')->group(function () {
     // Profile settings
@@ -42,6 +48,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/ajax/follow/user', [\App\Http\Controllers\FollowController::class, 'toggleUser'])->name('follow.user');
     Route::post('/ajax/vote', [\App\Http\Controllers\VoteController::class, 'toggleAjax'])->name('vote.toggle');
     Route::post('/ajax/reports', [\App\Http\Controllers\ModerationController::class, 'flagAjax'])->name('reports.flag');
+    Route::get('/ajax/games/{game}/tags', [\App\Http\Controllers\GameController::class, 'tagsJson'])->name('games.tags.ajax');
+    Route::get('/ajax/users/search', [\App\Http\Controllers\UserProfileController::class, 'searchJson'])->name('users.search.ajax');
 
     // Notifications channels
     Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
@@ -61,6 +69,8 @@ Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show')
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('games/lookup', [GameManagementController::class, 'lookup'])->name('games.lookup');
     Route::resource('games', GameManagementController::class);
+    Route::post('games/{game}/links', [GameManagementController::class, 'storeLink'])->name('games.links.store');
+    Route::delete('games/{game}/links/{link}', [GameManagementController::class, 'destroyLink'])->name('games.links.destroy');
 });
 
 require __DIR__.'/auth.php';

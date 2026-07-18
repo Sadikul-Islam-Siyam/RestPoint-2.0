@@ -155,10 +155,7 @@
 
         @else
             <!-- STATE 1: Standard Dashboard Feed -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                
-                <!-- Main Feed (Columns 1-8) -->
-                <div class="lg:col-span-8 space-y-6">
+            <div class="space-y-6">
                     @if($posts->isEmpty())
                         <div class="p-12 text-center bg-white dark:bg-darksurface rounded-lg border border-gray-200 dark:border-white/5 shadow-sm">
                             <p class="text-gray-500 dark:text-darkmuted text-lg">No activity to show in your feed yet.</p>
@@ -178,10 +175,24 @@
                             </div>
                         @endif
 
+                        <!-- Sort & Filter Control Bar -->
+                        <div class="flex justify-between items-center bg-white dark:bg-darksurface px-6 py-3 rounded-lg border border-gray-200 dark:border-white/5 shadow-sm">
+                            <span class="text-xs text-gray-400 dark:text-darkmuted font-bold">Activity Feed</span>
+                            
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-gray-500 dark:text-darkmuted">Sort:</span>
+                                <select onchange="window.location.href = this.value" class="bg-white dark:bg-darkbg text-gray-900 dark:text-darktext border-gray-300 dark:border-white/5 rounded text-xs py-1 px-2.5 focus:ring-darkaccent focus:border-darkaccent">
+                                    <option value="{{ route('dashboard', ['sort' => 'new']) }}" {{ request('sort', 'new') === 'new' ? 'selected' : '' }}>Newest</option>
+                                    <option value="{{ route('dashboard', ['sort' => 'popular']) }}" {{ request('sort') === 'popular' ? 'selected' : '' }}>Popular</option>
+                                    <option value="{{ route('dashboard', ['sort' => 'solved']) }}" {{ request('sort') === 'solved' ? 'selected' : '' }}>Solved</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <div class="space-y-4">
                             @foreach($posts as $post)
                                 @php
-                                    $hasVoted = auth()->check() ? $post->votes()->where('user_id', auth()->id())->exists() : false;
+                                    $hasVoted = in_array($post->id, $userVotedPostIds ?? []);
                                 @endphp
                                 <div class="bg-white dark:bg-darksurface p-6 rounded-lg border border-gray-200 dark:border-white/5 hover:border-gray-300 dark:hover:border-white/10 transition duration-150 flex gap-4 shadow-sm">
                                     <!-- Vote Column -->
@@ -260,56 +271,6 @@
                         </div>
                     @endif
                 </div>
-
-                <!-- Right Sidebar (Columns 9-12) -->
-                <div class="lg:col-span-4 space-y-6">
-                    
-                    <!-- Recent Posts Card -->
-                    <div class="bg-white dark:bg-darksurface p-6 rounded-lg border border-gray-200 dark:border-white/5 space-y-4 shadow-sm transition-colors duration-150">
-                        <div class="flex justify-between items-center">
-                            <h3 class="text-xs text-gray-400 dark:text-darkmuted uppercase font-bold tracking-wider">Recent Posts</h3>
-                        </div>
-                        <div class="space-y-4">
-                            @foreach($suggestedGames->take(3) as $sg)
-                                @php
-                                    $recentPost = $sg->posts()->latest()->first();
-                                @endphp
-                                @if($recentPost)
-                                    <div class="text-xs space-y-1">
-                                        <div class="flex justify-between items-center text-[10px] text-gray-400 dark:text-darkmuted">
-                                            <a href="{{ route('games.show', $sg->slug) }}" class="font-bold text-darkaccent hover:underline">r/{{ $sg->slug }}</a>
-                                            <span>&bull; {{ $recentPost->created_at->diffForHumans() }}</span>
-                                        </div>
-                                        <a href="{{ route('posts.show', $recentPost->id) }}" class="font-semibold text-gray-900 dark:text-darktext hover:text-darkaccent block hover:underline truncate">{{ $recentPost->title }}</a>
-                                    </div>
-                                @endif
-                            @endforeach
-                        </div>
-                    </div>
-
-                    <!-- Suggested Games Card -->
-                    <div class="bg-white dark:bg-darksurface p-6 rounded-lg border border-gray-200 dark:border-white/5 space-y-4 shadow-sm transition-colors duration-150">
-                        <h3 class="font-serif text-sm font-bold text-darkaccent uppercase tracking-wider">Suggested Games</h3>
-                        <div class="space-y-3">
-                            @foreach($suggestedGames as $sg)
-                                <div class="flex items-center justify-between gap-2 text-xs">
-                                    <div class="truncate">
-                                        <a href="{{ route('games.show', $sg->slug) }}" class="font-bold text-gray-900 dark:text-darktext hover:underline block truncate">{{ $sg->name }}</a>
-                                        <span class="text-[10px] text-gray-500 dark:text-darkmuted">{{ $sg->followers_count }} followers</span>
-                                    </div>
-                                    <button class="follow-game-btn text-[10px] text-darkaccent border border-darkaccent/30 hover:bg-darkaccent/10 px-2 py-1 rounded transition duration-100 shrink-0 font-bold"
-                                            data-game-id="{{ $sg->id }}"
-                                            data-url="{{ route('follow.game') }}">
-                                        Follow
-                                    </button>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
         @endif
     </div>
 </x-app-layout>

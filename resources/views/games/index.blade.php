@@ -5,18 +5,21 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-6">
+        <div>
             <!-- Filter Bar -->
             <div class="mb-8 p-4 bg-white dark:bg-darksurface rounded-lg border border-gray-200 dark:border-white/5 flex flex-wrap gap-4 items-center justify-between shadow-sm transition-colors duration-150">
                 <form method="GET" action="{{ route('games.index') }}" class="flex flex-wrap gap-4 w-full sm:w-auto">
                     <div>
                         <select name="genre" onchange="this.form.submit()" class="bg-white dark:bg-darkbg text-gray-900 dark:text-darktext border-gray-300 dark:border-white/5 rounded focus:ring-darkaccent focus:border-darkaccent text-sm">
                             <option value="">All Genres</option>
-                            <option value="Action RPG" {{ request('genre') === 'Action RPG' ? 'selected' : '' }}>Action RPG</option>
-                            <option value="Soulslike" {{ request('genre') === 'Soulslike' ? 'selected' : '' }}>Soulslike</option>
-                            <option value="Roguelike" {{ request('genre') === 'Roguelike' ? 'selected' : '' }}>Roguelike</option>
-                            <option value="Sandbox" {{ request('genre') === 'Sandbox' ? 'selected' : '' }}>Sandbox</option>
+                            <option value="Action" {{ request('genre') === 'Action' ? 'selected' : '' }}>Action</option>
+                            <option value="RPG" {{ request('genre') === 'RPG' ? 'selected' : '' }}>RPG</option>
+                            <option value="Adventure" {{ request('genre') === 'Adventure' ? 'selected' : '' }}>Adventure</option>
+                            <option value="Shooter" {{ request('genre') === 'Shooter' ? 'selected' : '' }}>Shooter</option>
+                            <option value="Indie" {{ request('genre') === 'Indie' ? 'selected' : '' }}>Indie</option>
+                            <option value="Strategy" {{ request('genre') === 'Strategy' ? 'selected' : '' }}>Strategy</option>
+                            <option value="Simulation" {{ request('genre') === 'Simulation' ? 'selected' : '' }}>Simulation</option>
                         </select>
                     </div>
                     <div>

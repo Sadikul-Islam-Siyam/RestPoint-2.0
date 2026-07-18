@@ -10,8 +10,8 @@
         </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+    <div class="py-6">
+        <div class="space-y-6">
             @if(session('success'))
                 <div class="p-4 bg-green-950/30 border border-green-900/20 text-green-400 rounded-lg text-sm">
                     {{ session('success') }}

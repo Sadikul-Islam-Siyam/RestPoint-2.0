@@ -61,4 +61,13 @@ class UserProfileController extends Controller
 
         return view('profile.show', compact('user', 'tab', 'posts', 'comments', 'overviewItems', 'isFollowing', 'mutualFollows'));
     }
+
+    public function searchJson(Request $request)
+    {
+        $q = $request->query('q');
+        $users = User::where('username', 'like', "%{$q}%")
+            ->take(5)
+            ->get(['id', 'username', 'name']);
+        return response()->json($users);
+    }
 }

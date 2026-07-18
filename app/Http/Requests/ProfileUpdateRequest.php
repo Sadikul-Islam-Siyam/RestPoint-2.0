@@ -26,6 +26,20 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
+            'username' => [
+                'required',
+                'string',
+                'min:3',
+                'max:30',
+                'alpha_dash',
+                Rule::unique(User::class)->ignore($this->user()->id),
+            ],
+            'bio' => ['nullable', 'string', 'max:500'],
+            'steam_url' => ['nullable', 'url', 'max:255'],
+            'psn_url' => ['nullable', 'url', 'max:255'],
+            'xbox_url' => ['nullable', 'url', 'max:255'],
+            'avatar_url' => ['nullable', 'url', 'max:500'],
+            'avatar_file' => ['nullable', 'image', 'max:5120'],
         ];
     }
 }

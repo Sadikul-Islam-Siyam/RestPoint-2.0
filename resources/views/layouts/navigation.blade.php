@@ -1,6 +1,6 @@
-<nav x-data="{ open: false }" class="bg-white dark:bg-darksurface border-b border-gray-200 dark:border-white/5 shadow-sm transition-colors duration-150">
+<nav x-data="{ open: false }" class="sticky top-0 z-50 bg-white dark:bg-darksurface border-b border-gray-200 dark:border-white/5 shadow-sm transition-colors duration-150">
     <!-- Primary Navigation Menu -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16 gap-4">
             
             <!-- Left Side: Logo & Links -->
@@ -151,13 +151,8 @@
 
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
-                            <button class="inline-flex items-center px-3 py-2 border border-gray-200 dark:border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-darkmuted bg-white dark:bg-darksurface hover:text-gray-700 dark:hover:text-darktext focus:outline-none transition ease-in-out duration-150">
-                                <div>{{ Auth::user()->name }}</div>
-                                <div class="ms-1">
-                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                    </svg>
-                                </div>
+                            <button class="flex items-center justify-center w-8 h-8 rounded-full border border-gray-200 dark:border-white/10 hover:opacity-85 focus:outline-none transition bg-darkaccent/10 shrink-0">
+                                <span class="font-serif text-sm font-extrabold text-darkaccent">{{ strtoupper(substr(Auth::user()->username, 0, 1)) }}</span>
                             </button>
                         </x-slot>
 

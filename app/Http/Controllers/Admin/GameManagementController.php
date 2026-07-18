@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Game;
+use App\Models\GameLink;
 use App\Services\GameLookupService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -137,6 +138,20 @@ class GameManagementController extends Controller
             ]);
         }
 
+        // Fetch details from RAWG to get purchase/store links if external_api_id is provided
+        if ($game->external_api_id) {
+            $details = $this->lookupService->fetchDetails($game->external_api_id);
+            if ($details && !empty($details['stores'])) {
+                foreach ($details['stores'] as $store) {
+                    GameLink::create([
+                        'game_id' => $game->id,
+                        'store_name' => $store['store_name'],
+                        'url' => $store['url'],
+                    ]);
+                }
+            }
+        }
+
         return redirect()->route('admin.games.index')->with('success', 'Game created successfully!');
     }
 
@@ -215,5 +230,27 @@ class GameManagementController extends Controller
         }
 
         return response()->json($gameData);
+    }
+
+    public function storeLink(Request $request, Game $game)
+    {
+        $validated = $request->validate([
+            'store_name' => 'required|string|max:255',
+            'url' => 'required|url|max:255',
+        ]);
+
+        GameLink::create([
+            'game_id' => $game->id,
+            'store_name' => $validated['store_name'],
+            'url' => $validated['url'],
+        ]);
+
+        return redirect()->back()->with('success', 'Purchase link added successfully!');
+    }
+
+    public function destroyLink(Game $game, GameLink $link)
+    {
+        $link->delete();
+        return redirect()->back()->with('success', 'Purchase link deleted successfully!');
     }
 }

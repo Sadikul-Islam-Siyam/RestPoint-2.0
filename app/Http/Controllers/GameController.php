@@ -20,7 +20,7 @@ class GameController extends Controller
             $query->where('platform', 'like', '%' . $request->platform . '%');
         }
 
-        $games = $query->paginate(12);
+        $games = $query->paginate(12)->withQueryString();
 
         return view('games.index', compact('games'));
     }
@@ -29,6 +29,7 @@ class GameController extends Controller
     {
         $game->load('gameLinks');
         $categories = $game->categories;
+        $tags = \App\Models\Tag::where('game_id', $game->id)->get();
         
         $postsQuery = Post::where('game_id', $game->id)
             ->with(['user', 'category', 'tags'])
@@ -40,11 +41,30 @@ class GameController extends Controller
             });
         }
 
+        if ($request->filled('tag')) {
+            $postsQuery->whereHas('tags', function ($q) use ($request) {
+                $q->where('slug', $request->tag);
+            });
+        }
+
         if ($request->filled('type')) {
             $postsQuery->where('type', $request->type);
         }
 
-        $posts = $postsQuery->orderBy('is_pinned', 'desc')->latest()->paginate(10);
+        $sort = $request->input('sort', 'new');
+        if ($sort === 'popular') {
+            $postsQuery->orderBy('is_pinned', 'desc')
+                       ->orderByRaw('(comments_count + votes_count) DESC');
+        } elseif ($sort === 'solved') {
+            $postsQuery->where('is_solved', true)
+                       ->orderBy('is_pinned', 'desc')
+                       ->latest();
+        } else {
+            $postsQuery->orderBy('is_pinned', 'desc')
+                       ->latest();
+        }
+
+        $posts = $postsQuery->paginate(10);
 
         // Compute stats
         $stats = [
@@ -52,6 +72,22 @@ class GameController extends Controller
             'followers_count' => $game->followers()->count(),
         ];
 
-        return view('games.show', compact('game', 'categories', 'posts', 'stats'));
+        $userVotedPostIds = auth()->check() 
+            ? \App\Models\Vote::where('user_id', auth()->id())->where('votable_type', Post::class)->pluck('votable_id')->toArray() 
+            : [];
+
+        return view('games.show', compact('game', 'categories', 'tags', 'posts', 'stats', 'userVotedPostIds'));
+    }
+
+    public function tagsJson(Game $game, Request $request)
+    {
+        $q = $request->query('q');
+        $tags = \App\Models\Tag::where('game_id', $game->id)
+            ->when($q, function ($query) use ($q) {
+                $query->where('name', 'like', "%{$q}%");
+            })
+            ->take(10)
+            ->get();
+        return response()->json($tags);
     }
 }

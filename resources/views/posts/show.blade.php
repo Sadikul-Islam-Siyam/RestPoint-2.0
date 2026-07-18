@@ -21,8 +21,8 @@
         </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-8">
+    <div class="py-6">
+        <div class="space-y-8">
             <!-- Alert message -->
             @if(session('success'))
                 <div class="p-4 bg-green-100 dark:bg-green-950/30 border border-green-200 dark:border-green-900/20 text-green-800 dark:text-green-400 rounded-lg text-sm transition-colors duration-150">
@@ -41,7 +41,7 @@
                         <span class="px-2 py-0.5 bg-gray-100 dark:bg-white/5 text-darkaccent rounded-full text-[10px] font-semibold">{{ $post->category->name }}</span>
                     @endif
                     @if($post->type === 'help')
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ $post->is_solved ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' }}">
+                        <span id="post_solved_badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ $post->is_solved ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' }}">
                             {{ $post->is_solved ? 'Solved' : 'Unsolved' }}
                         </span>
                     @endif
@@ -77,14 +77,14 @@
                 <div class="pt-4 border-t border-gray-200 dark:border-white/5 flex justify-between items-center flex-wrap gap-4 text-xs text-gray-500 dark:text-darkmuted">
                     <div class="flex items-center gap-4">
                         @php
-                            $hasPostVoted = auth()->check() ? $post->votes()->where('user_id', auth()->id())->exists() : false;
+                            $hasPostVoted = in_array($post->id, $userVotedPostIds ?? []);
                         @endphp
                         <button class="vote-btn hover:text-darkaccent transition flex items-center gap-1 font-semibold {{ $hasPostVoted ? 'text-darkaccent' : 'text-gray-500 dark:text-darkmuted' }}"
                                 data-id="{{ $post->id }}"
                                 data-type="post"
                                 data-url="{{ route('vote.toggle') }}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
-                            Upvote (<span class="vote-count font-bold">{{ $post->votes()->count() }}</span>)
+                            Upvote (<span class="vote-count font-bold">{{ $post->votes_count }}</span>)
                         </button>
                         <span>&bull;</span>
                         <span>{{ $post->views }} views</span>
@@ -130,8 +130,9 @@
                         <input type="hidden" name="post_id" value="{{ $post->id }}">
                         
                         <div>
-                            <x-input-label for="body" :value="__('Write a comment')" class="text-gray-900 dark:text-darktext text-sm" />
-                            <textarea id="body" name="body" rows="3" class="w-full bg-white dark:bg-darkbg text-gray-900 dark:text-darktext border-gray-300 dark:border-white/5 rounded mt-1 focus:ring-darkaccent focus:border-darkaccent text-sm shadow-sm" required placeholder="Share your thoughts..."></textarea>
+                            <x-input-label for="comment_body" :value="__('Write a comment')" class="text-gray-900 dark:text-darktext text-sm" />
+                            <input id="comment_body" type="hidden" name="body" required>
+                            <trix-editor input="comment_body" class="trix-content bg-white dark:bg-darkbg text-gray-900 dark:text-darktext border border-gray-300 dark:border-white/5 rounded mt-1 focus:ring-darkaccent focus:border-darkaccent text-sm shadow-sm min-h-[120px]" placeholder="Share your thoughts..."></trix-editor>
                         </div>
 
                         <button type="submit" class="px-5 py-2 bg-darkaccent text-white dark:text-darkbg font-semibold rounded hover:opacity-90 transition duration-150 text-xs shadow-sm">
@@ -149,27 +150,26 @@
                     @foreach($comments as $comment)
                         <div class="space-y-4">
                             <!-- Top-level Comment -->
-                            <div x-data="{ open: false }" class="bg-white dark:bg-darksurface p-6 rounded-lg border {{ $comment->is_accepted ? 'border-green-500 bg-green-50 dark:bg-green-950/10' : 'border-gray-200 dark:border-white/5' }} space-y-3 shadow-sm transition-colors duration-150">
+                            <div x-data="{ open: false }" class="comment-card bg-white dark:bg-darksurface p-6 rounded-lg border {{ $comment->is_accepted ? 'border-green-500 bg-green-50 dark:bg-green-950/10' : 'border-gray-200 dark:border-white/5' }} space-y-3 shadow-sm transition-colors duration-150">
                                 <div class="flex justify-between items-start flex-wrap gap-2 text-xs text-gray-500 dark:text-darkmuted">
-                                    <div class="flex items-center gap-2">
+                                    <div class="comment-header flex items-center gap-2">
                                         <a href="{{ route('profile.show', $comment->user->username) }}" class="font-bold text-gray-900 dark:text-darktext hover:text-darkaccent transition">{{ $comment->user->username }}</a>
                                         <span>&bull;</span>
                                         <span>{{ $comment->created_at->diffForHumans() }}</span>
                                         @if($comment->is_accepted)
-                                            <span class="px-2 py-0.5 bg-emerald-500 text-white font-bold rounded text-[9px] uppercase tracking-wider">Solution</span>
+                                            <span class="solution-badge px-2 py-0.5 bg-emerald-500 text-white font-bold rounded text-[9px] uppercase tracking-wider">Solution</span>
                                         @endif
                                     </div>
                                     
                                     <div class="flex items-center gap-2">
                                         <!-- Solved action -->
                                         @if($post->type === 'help' && !$comment->is_accepted && auth()->check() && auth()->id() === $post->user_id)
-                                            <form method="POST" action="{{ route('posts.solve', $post->id) }}">
-                                                @csrf
-                                                <input type="hidden" name="comment_id" value="{{ $comment->id }}">
-                                                <button type="submit" class="text-[10px] text-green-600 dark:text-green-400 border border-green-500/20 px-2 py-0.5 rounded bg-green-50 dark:bg-green-950/20 hover:bg-green-100 dark:hover:bg-green-950/40">
-                                                    Accept Solution
-                                                </button>
-                                            </form>
+                                            <button type="button" class="solve-btn text-[10px] text-green-600 dark:text-green-400 border border-green-500/20 px-2 py-0.5 rounded bg-green-50 dark:bg-green-950/20 hover:bg-green-100 dark:hover:bg-green-950/40"
+                                                    data-post-id="{{ $post->id }}"
+                                                    data-comment-id="{{ $comment->id }}"
+                                                    data-url="{{ route('posts.solve', $post->id) }}">
+                                                Accept Solution
+                                            </button>
                                         @endif
 
                                         @if(auth()->check() && (auth()->id() === $comment->user_id || auth()->user()->role === 'admin' || auth()->user()->role === 'moderator'))
@@ -189,14 +189,14 @@
                                 <!-- Actions (Reply & Upvote) -->
                                 <div class="flex items-center gap-4 text-xs mt-3 pt-2 border-t border-gray-100 dark:border-white/5">
                                     @php
-                                        $hasCommentVoted = auth()->check() ? $comment->votes()->where('user_id', auth()->id())->exists() : false;
+                                        $hasCommentVoted = in_array($comment->id, $userVotedCommentIds ?? []);
                                     @endphp
                                     <button class="vote-btn hover:text-darkaccent transition flex items-center gap-1 font-semibold {{ $hasCommentVoted ? 'text-darkaccent' : 'text-gray-500 dark:text-darkmuted' }}"
                                             data-id="{{ $comment->id }}"
                                             data-type="comment"
                                             data-url="{{ route('vote.toggle') }}">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
-                                        Upvote (<span class="vote-count font-bold">{{ $comment->votes()->count() }}</span>)
+                                        Upvote (<span class="vote-count font-bold">{{ $comment->votes_count }}</span>)
                                     </button>
 
                                     @auth

@@ -15,10 +15,13 @@ class PostController extends Controller
     {
         // Eager load comments and nested comments (level 2) with their users
         $post->load(['user', 'game', 'category', 'tags']);
+        $post->loadCount('votes');
         
         $comments = $post->comments()
             ->whereNull('parent_id')
-            ->with(['user', 'replies.user'])
+            ->with(['user', 'replies' => function ($q) {
+                $q->with('user')->withCount('votes');
+            }])
             ->withCount('votes')
             ->get();
 
@@ -29,7 +32,15 @@ class PostController extends Controller
             session()->push('viewed_posts', $post->id);
         }
 
-        return view('posts.show', compact('post', 'comments'));
+        $userVotedPostIds = auth()->check() 
+            ? \App\Models\Vote::where('user_id', auth()->id())->where('votable_type', Post::class)->pluck('votable_id')->toArray() 
+            : [];
+            
+        $userVotedCommentIds = auth()->check() 
+            ? \App\Models\Vote::where('user_id', auth()->id())->where('votable_type', \App\Models\Comment::class)->pluck('votable_id')->toArray() 
+            : [];
+
+        return view('posts.show', compact('post', 'comments', 'userVotedPostIds', 'userVotedCommentIds'));
     }
 
     public function create(Request $request)
@@ -153,6 +164,14 @@ class PostController extends Controller
 
         // Award XP and check badges for solution author
         (new \App\Services\BadgeService())->awardXP($comment->user, 50);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Help request solved! Thank you.',
+                'comment_id' => $comment->id
+            ]);
+        }
 
         return redirect()->route('posts.show', $post->id)->with('success', 'Help request solved! Thank you.');
     }

@@ -3,7 +3,7 @@
     <div class="h-28 bg-gradient-to-r from-darkaccent/10 to-darkbg border-b border-gray-200 dark:border-white/5 transition-colors duration-150"></div>
 
     <div class="py-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="px-6">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 
                 <!-- Main Feed Area (Columns 1-8) -->

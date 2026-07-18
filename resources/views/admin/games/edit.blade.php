@@ -5,8 +5,8 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-6">
+        <div>
             <div class="bg-white dark:bg-darksurface p-8 rounded-lg border border-gray-200 dark:border-white/5 shadow-sm transition-colors duration-150">
                 <form method="POST" action="{{ route('admin.games.update', $game->id) }}" enctype="multipart/form-data" class="space-y-6">
                     @csrf
@@ -98,7 +98,7 @@
                     <!-- Action buttons -->
                     <div class="flex items-center gap-4 pt-4 border-t border-gray-200 dark:border-white/5">
                         <button type="submit" class="px-6 py-2.5 bg-darkaccent text-white dark:text-darkbg font-semibold rounded hover:opacity-90 transition duration-150 text-sm shadow-sm">
-                            Update Game Listing
+                            Save Game Listing
                         </button>
                         <a href="{{ route('admin.games.index') }}" class="text-sm text-gray-500 dark:text-darkmuted hover:text-gray-900 dark:hover:text-darktext">
                             Cancel
@@ -106,6 +106,53 @@
                     </div>
                 </form>
             </div>
+
+            <!-- Purchase Links Curator Panel -->
+            <div class="mt-8 bg-white dark:bg-darksurface p-8 rounded-lg border border-gray-200 dark:border-white/5 shadow-sm space-y-6 transition-colors duration-150">
+                <h3 class="font-serif text-lg font-bold text-darkaccent border-b border-gray-100 dark:border-white/5 pb-2">Purchase & Store Links</h3>
+                
+                @if($game->gameLinks->isEmpty())
+                    <p class="text-xs text-gray-500 dark:text-darkmuted">No store links associated with this game listing yet.</p>
+                @else
+                    <div class="space-y-3">
+                        @foreach($game->gameLinks as $link)
+                            <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-black/25 rounded border border-gray-100 dark:border-white/[0.02]">
+                                <div class="text-xs">
+                                    <strong class="text-gray-900 dark:text-darktext">{{ $link->store_name }}</strong> &bull; 
+                                    <a href="{{ $link->url }}" target="_blank" class="text-darkaccent hover:underline">{{ $link->url }}</a>
+                                </div>
+                                <form method="POST" action="{{ route('admin.games.links.destroy', [$game->id, $link->id]) }}" onsubmit="return confirm('Delete this store link?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-xs text-red-500 dark:text-red-400 hover:underline">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('admin.games.links.store', $game->id) }}" class="pt-4 border-t border-gray-100 dark:border-white/5 space-y-4">
+                    @csrf
+                    <h4 class="text-xs text-gray-400 dark:text-darkmuted uppercase font-bold tracking-wider">Add Store Link</h4>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <x-input-label for="store_name" :value="__('Store Name')" class="text-gray-700 dark:text-darktext" />
+                            <x-text-input id="store_name" name="store_name" type="text" class="w-full bg-white dark:bg-darkbg text-gray-900 dark:text-darktext border-gray-300 dark:border-white/5 rounded mt-1 focus:ring-darkaccent focus:border-darkaccent shadow-sm" placeholder="e.g. Steam, Epic Games, PlayStation" required />
+                        </div>
+                        <div>
+                            <x-input-label for="url" :value="__('Store URL')" class="text-gray-700 dark:text-darktext" />
+                            <x-text-input id="url" name="url" type="url" class="w-full bg-white dark:bg-darkbg text-gray-900 dark:text-darktext border-gray-300 dark:border-white/5 rounded mt-1 focus:ring-darkaccent focus:border-darkaccent shadow-sm" placeholder="https://store.steampowered.com/app/..." required />
+                        </div>
+                    </div>
+                    <button type="submit" class="px-4 py-2 bg-darkaccent text-white dark:text-darkbg font-semibold rounded hover:opacity-90 transition duration-150 text-xs shadow-sm">
+                        Add Store Link
+                    </button>
+                </form>
+            </div>
+
         </div>
     </div>
 </x-app-layout>

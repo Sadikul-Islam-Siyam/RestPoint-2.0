@@ -46,6 +46,15 @@
             trix-editor {
                 min-height: 250px !important;
             }
+            /* Hide scrollbar for Chrome, Safari and Opera */
+            .no-scrollbar::-webkit-scrollbar {
+                display: none;
+            }
+            /* Hide scrollbar for IE, Edge and Firefox */
+            .no-scrollbar {
+                -ms-overflow-style: none;  /* IE and Edge */
+                scrollbar-width: none;  /* Firefox */
+            }
         </style>
 
         <!-- Scripts -->
@@ -56,29 +65,29 @@
             @include('layouts.navigation')
 
             <!-- Page Content -->
-            <main class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <main class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     
                     <!-- Left Sidebar -->
-                    <aside class="hidden lg:block lg:col-span-3 space-y-6 shrink-0">
+                    <aside class="hidden lg:block lg:col-span-3 xl:col-span-2 space-y-6 shrink-0 sticky top-[80px] h-[calc(100vh-110px)] overflow-y-auto pr-2 no-scrollbar">
                         <!-- Navigation Menu -->
                         <div class="bg-white dark:bg-darksurface rounded-lg border border-gray-200 dark:border-white/5 p-4 space-y-2 shadow-sm transition-colors duration-150">
                             <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold transition {{ request()->routeIs('dashboard') ? 'bg-darkaccent/10 text-darkaccent font-extrabold' : 'text-gray-700 dark:text-darkmuted hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-darktext' }}">
                                 <span class="text-base">🏠</span>
                                 <span>Home</span>
                             </a>
-                            <a href="{{ route('games.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold transition {{ request()->routeIs('games.*') ? 'bg-darkaccent/10 text-darkaccent font-extrabold' : 'text-gray-700 dark:text-darkmuted hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-darktext' }}">
+                            <a href="{{ route('popular') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold transition {{ request()->routeIs('popular') ? 'bg-darkaccent/10 text-darkaccent font-extrabold' : 'text-gray-700 dark:text-darkmuted hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-darktext' }}">
                                 <span class="text-base">🔥</span>
                                 <span>Popular</span>
                             </a>
-                            <div class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold text-gray-400 dark:text-darkmuted/40 cursor-not-allowed">
+                            <a href="{{ route('news') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold transition {{ request()->routeIs('news') ? 'bg-darkaccent/10 text-darkaccent font-extrabold' : 'text-gray-700 dark:text-darkmuted hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-darktext' }}">
                                 <span class="text-base">📰</span>
                                 <span>News</span>
-                            </div>
-                            <div class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold text-gray-400 dark:text-darkmuted/40 cursor-not-allowed">
+                            </a>
+                            <a href="{{ route('explore') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold transition {{ request()->routeIs('explore') ? 'bg-darkaccent/10 text-darkaccent font-extrabold' : 'text-gray-700 dark:text-darkmuted hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-darktext' }}">
                                 <span class="text-base">🌐</span>
                                 <span>Explore</span>
-                            </div>
+                            </a>
                         </div>
 
                         <!-- Games Section -->
@@ -115,9 +124,55 @@
                     </aside>
 
                     <!-- Main Content Panel -->
-                    <div class="lg:col-span-9">
+                    <div class="lg:col-span-9 xl:col-span-7">
                         {{ $slot }}
                     </div>
+
+                    <!-- Right Sidebar -->
+                    <aside class="hidden xl:block xl:col-span-3 space-y-6 shrink-0 sticky top-[80px] h-[calc(100vh-110px)] overflow-y-auto pl-2 no-scrollbar">
+                        <!-- Recent Posts Card -->
+                        <div class="bg-white dark:bg-darksurface p-6 rounded-lg border border-gray-200 dark:border-white/5 space-y-4 shadow-sm transition-colors duration-150">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-xs text-gray-400 dark:text-darkmuted uppercase font-bold tracking-wider">Recent Posts</h3>
+                            </div>
+                            <div class="space-y-4">
+                                @foreach($suggestedGames->take(3) as $sg)
+                                    @php
+                                        $recentPost = $sg->latestPost;
+                                    @endphp
+                                    @if($recentPost)
+                                        <div class="text-xs space-y-1">
+                                            <div class="flex justify-between items-center text-[10px] text-gray-400 dark:text-darkmuted">
+                                                <a href="{{ route('games.show', $sg->slug) }}" class="font-bold text-darkaccent hover:underline">r/{{ $sg->slug }}</a>
+                                                <span>&bull; {{ $recentPost->created_at->diffForHumans() }}</span>
+                                            </div>
+                                            <a href="{{ route('posts.show', $recentPost->id) }}" class="font-semibold text-gray-900 dark:text-darktext hover:text-darkaccent block hover:underline truncate">{{ $recentPost->title }}</a>
+                                        </div>
+                                    @endif
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <!-- Suggested Games Card -->
+                        <div class="bg-white dark:bg-darksurface p-6 rounded-lg border border-gray-200 dark:border-white/5 space-y-4 shadow-sm transition-colors duration-150">
+                            <h3 class="font-serif text-sm font-bold text-darkaccent uppercase tracking-wider">Suggested Games</h3>
+                            <div class="space-y-3">
+                                @foreach($suggestedGames as $sg)
+                                    <div class="flex items-center justify-between gap-2 text-xs">
+                                        <div class="truncate">
+                                            <a href="{{ route('games.show', $sg->slug) }}" class="font-bold text-gray-900 dark:text-darktext hover:underline block truncate">{{ $sg->name }}</a>
+                                            <span class="text-[10px] text-gray-500 dark:text-darkmuted">{{ $sg->followers_count }} followers</span>
+                                        </div>
+                                        <button class="follow-game-btn text-[10px] text-darkaccent border border-darkaccent/30 hover:bg-darkaccent/10 px-2 py-1 rounded transition duration-100 shrink-0 font-bold"
+                                                data-game-id="{{ $sg->id }}"
+                                                data-url="{{ route('follow.game') }}">
+                                            Follow
+                                        </button>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </aside>
                 </div>
             </main>
         </div>
@@ -127,5 +182,8 @@
         <script src="{{ asset('js/notifications.js') }}" defer></script>
         <script src="{{ asset('js/vote.js') }}" defer></script>
         <script src="{{ asset('js/report.js') }}" defer></script>
+        <script src="{{ asset('js/solve.js') }}" defer></script>
+        <script src="{{ asset('js/tags.js') }}" defer></script>
+        <script src="{{ asset('js/mentions.js') }}" defer></script>
     </body>
 </html>

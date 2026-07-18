@@ -14,6 +14,10 @@ class DashboardController extends Controller
         $q = $request->input('q');
         $ask = $request->boolean('ask');
 
+        $userVotedPostIds = auth()->check() 
+            ? \App\Models\Vote::where('user_id', auth()->id())->where('votable_type', Post::class)->pluck('votable_id')->toArray() 
+            : [];
+
         // Check if there is an active search or AI query
         if ($q) {
             $matchingGames = Game::where('name', 'like', "%{$q}%")
@@ -56,7 +60,7 @@ class DashboardController extends Controller
                 }
             }
 
-            return view('dashboard', compact('q', 'ask', 'matchingGames', 'matchingPosts', 'aiAnswer'));
+            return view('dashboard', compact('q', 'ask', 'matchingGames', 'matchingPosts', 'aiAnswer', 'userVotedPostIds'));
         }
 
         // Standard Feed logic
@@ -76,16 +80,21 @@ class DashboardController extends Controller
             });
         }
 
-        $posts = $postsQuery->orderBy('is_pinned', 'desc')->latest()->paginate(10);
+        $sort = $request->input('sort', 'new');
+        if ($sort === 'popular') {
+            $postsQuery->orderBy('is_pinned', 'desc')
+                       ->orderByRaw('(comments_count + votes_count) DESC');
+        } elseif ($sort === 'solved') {
+            $postsQuery->where('is_solved', true)
+                       ->orderBy('is_pinned', 'desc')
+                       ->latest();
+        } else {
+            $postsQuery->orderBy('is_pinned', 'desc')
+                       ->latest();
+        }
 
-        $suggestedGames = Game::withCount('followers')
-            ->when($followedGameIds->isNotEmpty(), function ($q) use ($followedGameIds) {
-                $q->whereNotIn('id', $followedGameIds);
-            })
-            ->orderBy('followers_count', 'desc')
-            ->take(5)
-            ->get();
+        $posts = $postsQuery->paginate(10);
 
-        return view('dashboard', compact('posts', 'suggestedGames', 'hasFollows'));
+        return view('dashboard', compact('posts', 'hasFollows', 'userVotedPostIds'));
     }
 }

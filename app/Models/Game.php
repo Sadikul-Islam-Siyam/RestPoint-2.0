@@ -16,6 +16,11 @@ class Game extends Model
         return $this->hasMany(Post::class);
     }
 
+    public function latestPost()
+    {
+        return $this->hasOne(Post::class)->latestOfMany();
+    }
+
     public function categories()
     {
         return $this->hasMany(Category::class);

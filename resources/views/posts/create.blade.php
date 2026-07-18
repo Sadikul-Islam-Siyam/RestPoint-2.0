@@ -5,8 +5,8 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-6">
+        <div>
             <div class="bg-white dark:bg-darksurface p-8 rounded-lg border border-gray-200 dark:border-white/5 space-y-6 shadow-sm transition-colors duration-150">
                 
                 <form method="POST" action="{{ route('posts.store') }}" class="space-y-6">
@@ -59,6 +59,13 @@
                     <!-- Tags selection -->
                     <div>
                         <x-input-label :value="__('Select Tags')" class="text-gray-900 dark:text-darktext" />
+                        
+                        <!-- Autocomplete Search Input -->
+                        <div class="relative mt-1 mb-2">
+                            <x-text-input id="tag_search_input" type="text" class="w-full bg-white dark:bg-darkbg text-gray-900 dark:text-darktext border-gray-300 dark:border-white/5 rounded focus:ring-darkaccent focus:border-darkaccent shadow-sm text-xs" placeholder="Search tags for the selected game..." autocomplete="off" />
+                            <div id="tag_suggestions" class="absolute left-0 right-0 mt-1 bg-white dark:bg-darksurface rounded border border-gray-200 dark:border-white/5 shadow-lg hidden z-50 py-1 divide-y divide-gray-100 dark:divide-white/5 max-h-48 overflow-y-auto"></div>
+                        </div>
+
                         <div id="tags_container" class="flex flex-wrap gap-2 mt-2 min-h-[40px] items-center p-3 bg-gray-50 dark:bg-black/20 rounded border border-gray-200 dark:border-white/5 transition-colors duration-150">
                             <!-- Clickable tags dynamically inserted here -->
                         </div>
